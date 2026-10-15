@@ -91,6 +91,19 @@ export function AnswerView({ message }: { message: UiMessage }) {
         <p role="alert" className="text-destructive text-sm">
           {message.content}
         </p>
+      ) : result?.status === "info" ? (
+        // A fixed reply about the assistant: no sources, so no verified badge.
+        <div
+          role="status"
+          className="bg-muted flex max-w-prose flex-col gap-2 rounded-lg p-4"
+        >
+          <Badge variant="secondary" className="text-muted-foreground w-fit">
+            Tájékoztatás
+          </Badge>
+          <p className="text-sm leading-relaxed wrap-break-word whitespace-pre-wrap">
+            {result.answer}
+          </p>
+        </div>
       ) : result?.status === "not_found" ? (
         <div
           role="status"

@@ -3,6 +3,8 @@ import "server-only";
 import { generateText, streamText } from "ai";
 
 import { embedQuery } from "@/lib/embeddings";
+import { assistantReply } from "@/lib/generation/assistant-help";
+import { classifyIntent } from "@/lib/generation/intent";
 import { generationOptions } from "@/lib/generation/model";
 import { buildRetryPrompt, buildUserPrompt } from "@/lib/generation/prompt";
 import {
@@ -38,7 +40,8 @@ export type CitedSource = Pick<
 >;
 
 export type FinalResult = {
-  status: "answered" | "partial" | "not_found";
+  // "info": a fixed reply about the assistant or to small talk, with no sources.
+  status: "answered" | "partial" | "not_found" | "info";
   answer: string;
   reason?: "no_relevant_source" | "validation_failed" | "model_not_found";
   citations: { n: number; quote: string; source: CitedSource }[];
@@ -84,9 +87,17 @@ export async function* answerQuestion(
 
     // 3. Nothing relevant: refuse without calling the generation model.
     if (sources.length === 0) {
+      // "Mit tudok tőled kérdezni?", "Szia", "Köszönöm" find no source but
+      // deserve a reply. Classified only here, so answerable questions pay
+      // no extra latency; the reply is fixed text, never generated.
+      const reply = assistantReply(
+        await classifyIntent(input.question, signal),
+      );
       yield {
         type: "final",
-        result: notFound("no_relevant_source", retrieved),
+        result: reply
+          ? { status: "info", answer: reply, citations: [], retrieved }
+          : notFound("no_relevant_source", retrieved),
       };
       return;
     }
