@@ -4,8 +4,13 @@ import { z } from "zod";
 
 const envSchema = z.object({
   OPENAI_API_KEY: z.string().min(1),
-  // Supabase transaction pooler (port 6543); migrations use DATABASE_URL_SESSION instead.
-  DATABASE_URL: z.url(),
+  MONGODB_URI: z
+    .string()
+    .regex(
+      /^mongodb(\+srv)?:\/\//,
+      "must be a mongodb:// or mongodb+srv:// URI",
+    ),
+  MONGODB_DB: z.string().min(1).default("kb_assistant"),
   GENERATION_MODEL: z.string().min(1).default("gpt-5.5"),
   HELPER_MODEL: z.string().min(1).default("gpt-5.4-mini"),
   EMBEDDING_MODEL: z.string().min(1).default("text-embedding-3-small"),

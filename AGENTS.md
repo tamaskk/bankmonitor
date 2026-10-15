@@ -57,7 +57,7 @@ Do these in order, every session:
   Never log them, never send them to the client. The repository is public.
 - Authorization is checked on every server entry point, not just in the UI (Basic Auth in `src/proxy.ts`).
 - Escape and validate everything that comes from a user, a model, or a document.
-- SQL only through Drizzle or the `sql` template with parameters. Never `sql.raw()` with request data.
+- Database filters only from Zod-validated values. Never pass request objects or `$`-prefixed input into a MongoDB filter or pipeline (NoSQL injection).
 - No new auth flow, data deletion behavior, or change to the relevance threshold or the citation validator without explicit approval.
 - Read docs/SECURITY.md before changing auth, prompts, data handling, secrets or anything that reaches OpenAI or the database. Where it is stricter than this section, it wins.
 
@@ -72,8 +72,7 @@ npm run lint          lint
 npm run typecheck     next typegen + tsc --noEmit
 npm run test          unit tests (Vitest)
 npm run format        format the codebase (Prettier)
-npm run db:generate   generate a Drizzle migration (ask before running)
-npm run db:migrate    apply migrations to Supabase (ask before running)
+npm run db:setup      create collections and Atlas search indexes (ask before running)
 npm run ingest        load data/docs into the database (planned; ask before running)
 npm run eval          run the golden set (planned; costs OpenAI calls)
 ```
@@ -98,7 +97,7 @@ Stop and ask instead of guessing when:
 - The task conflicts with the PRD, the design system, or an architectural boundary.
 - Two reasonable readings of the task lead to different work.
 - The change needs a new dependency, table, secret, or service.
-- A command would write to the shared Supabase database (migration, ingest, manual SQL).
+- A command would write to the shared Atlas cluster (db:setup, ingest, manual writes).
 - Something is broken that the task did not mention.
 
 Ask with the specific question, the options you see, and your recommendation.

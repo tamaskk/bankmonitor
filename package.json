@@ -14,8 +14,7 @@
     "test:watch": "vitest",
     "ingest": "tsx scripts/ingest.ts",
     "eval": "tsx scripts/eval.ts",
-    "db:generate": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit migrate"
+    "db:setup": "tsx scripts/setup-db.ts"
   },
   "dependencies": {
     "@ai-sdk/openai": "^4.0.94",
@@ -23,11 +22,10 @@
     "ai": "^7.0.141",
     "class-variance-authority": "^0.7.1",
     "cn": "^0.4.0",
-    "drizzle-orm": "^0.45.4",
     "gray-matter": "^4.0.3",
     "lucide-react": "^1.57.0",
+    "mongodb": "^7.7.0",
     "next": "16.4.1",
-    "postgres": "^3.4.9",
     "react": "19.3.0",
     "react-dom": "19.3.0",
     "server-only": "^0.0.1",
@@ -41,7 +39,6 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "dotenv": "^18.0.8",
-    "drizzle-kit": "^0.31.11",
     "eslint": "^9",
     "eslint-config-next": "16.4.1",
     "prettier": "^3.9.10",
