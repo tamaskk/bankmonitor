@@ -119,6 +119,19 @@ async function main() {
     ),
     answerRate: ratio(answerable.filter((r) => r.ok).length, answerable.length),
   };
+  // Pipeline errors also lower the answer rate; count them separately so a
+  // flaky run is not mistaken for a quality drop.
+  const errors = results.filter((r) => r.status === "error").length;
+  const missedTargets = [
+    metrics.citationAccuracy !== null &&
+    metrics.citationAccuracy < TARGETS.citationAccuracy
+      ? "citation accuracy"
+      : null,
+    metrics.correctRefusal !== null &&
+    metrics.correctRefusal < TARGETS.correctRefusal
+      ? "correct refusal"
+      : null,
+  ].filter((name): name is string => name !== null);
 
   console.table(
     results.map(
@@ -163,6 +176,7 @@ async function main() {
       value: percent(metrics.answerRate),
       target: "-",
     },
+    { metric: "pipeline errors", value: String(errors), target: "0" },
   ]);
 
   await mkdir("eval", { recursive: true });
@@ -178,6 +192,7 @@ async function main() {
         },
         rerankThreshold: env.RERANK_THRESHOLD,
         items: results.length,
+        errors,
         metrics,
         targets: TARGETS,
         results,
@@ -187,6 +202,15 @@ async function main() {
     )}\n`,
   );
   console.log(`\nwrote ${RESULTS_PATH}`);
+
+  // Non-zero exit when a target is missed or a run errored, so a script or CI
+  // step cannot pass silently. The results file is written either way.
+  if (missedTargets.length > 0 || errors > 0) {
+    console.error(
+      `targets missed: ${missedTargets.join(", ") || "none"}; pipeline errors: ${errors}`,
+    );
+    process.exitCode = 1;
+  }
 }
 
 main()
