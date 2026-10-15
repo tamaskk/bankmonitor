@@ -4,8 +4,6 @@ Derived from docs/PRD.md §05 and docs/planning/demo-gap-analysis.hu.md (task nu
 
 ## Now
 
-- [ ] T-003 (F1) `src/db/collections.ts` and idempotent `npm run db:indexes`: unique `slug`, `documentId` index, `chunks_vector` (1536, cosine, filters `products`, `banks`, `bankGeneral`) and `chunks_text` (`lucene.hungarian`) search indexes
-
 ## Next
 
 - [ ] T-004 (F1) Markdown loader with Zod front matter validation, all-or-nothing (`src/lib/ingest/load.ts`)
@@ -40,6 +38,7 @@ Derived from docs/PRD.md §05 and docs/planning/demo-gap-analysis.hu.md (task nu
 
 ## Done
 
+- [x] T-003 `src/db/types.ts`, `npm run db:indexes` (idempotent): `documentId_1`, `chunks_vector` and `chunks_text` READY; Hungarian stemming verified ("hiteleket" finds "hitel")
 - [x] T-002 Atlas connection: `src/db/client.ts`, `npm run db:check` (ping ok, MongoDB 8.0.34, database `kb_assistant`)
 - [x] T-000 Inputs: 15 `data/docs/*.md` (4 mortgage + CIB Bank, 4 personal loan incl. MBH Bank, 3 account incl. OTP Bank, 3 general) and `data/golden-set.json` (15 questions, 4 unanswerable, 2 with a bank filter)
 - [x] T-001 Project scaffold: Next.js 16, Tailwind v4, shadcn/ui, dependencies, scripts, `src/lib/env.ts`, `.env.example`, git (data inputs moved to T-000)
