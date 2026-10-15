@@ -1,36 +1,49 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# KB Assistant
 
-## Getting Started
+An internal RAG assistant demo for Bankmonitor loan experts: ask a question in Hungarian, get an answer built only from the knowledge base, with a verified quote for every claim. When no reliable source exists, it says so instead of guessing.
 
-First, run the development server:
+> Status: work in progress. The scaffold and the agent harness are in place; the pipeline is being built task by task (see [docs/TASKS.md](docs/TASKS.md)). Architecture diagram, accuracy layers and eval results will be added in T-022.
+
+## Source of truth
+
+| What                                                     | Where                                                                |
+| -------------------------------------------------------- | -------------------------------------------------------------------- |
+| What we build and why, scope, metrics                    | [docs/PRD.md](docs/PRD.md)                                           |
+| How it looks                                             | [docs/DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md)                       |
+| Where code lives, boundaries, intentional decisions      | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)                         |
+| Security rules                                           | [docs/SECURITY.md](docs/SECURITY.md)                                 |
+| Task list                                                | [docs/TASKS.md](docs/TASKS.md)                                       |
+| Original solution design and task-level plan (Hungarian) | [docs/planning/](docs/planning/)                                     |
+| Rules for AI coding agents                               | [AGENTS.md](AGENTS.md), [CLAUDE.md](CLAUDE.md), [.claude/](.claude/) |
+
+## Stack
+
+Next.js 16 (App Router) · TypeScript · Tailwind CSS v4 + shadcn/ui · Supabase Postgres with pgvector and Hungarian full-text search · Drizzle ORM · Vercel AI SDK + OpenAI · Vitest · Vercel.
+
+## Run locally
+
+Requires Node.js 24 (`nvm use`).
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+cp .env.example .env.local   # then fill in the values
+npm run dev                  # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Scripts
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Script                                       | What it does                                                   |
+| -------------------------------------------- | -------------------------------------------------------------- |
+| `npm run dev`                                | Development server                                             |
+| `npm run build` / `npm run start`            | Production build / server                                      |
+| `npm run lint`                               | ESLint                                                         |
+| `npm run typecheck`                          | `next typegen` + `tsc --noEmit`                                |
+| `npm run test` / `npm run test:watch`        | Vitest unit tests                                              |
+| `npm run format` / `npm run format:check`    | Prettier                                                       |
+| `npm run db:generate` / `npm run db:migrate` | Drizzle migrations (planned, T-003)                            |
+| `npm run ingest`                             | Load `data/docs` into the database (planned, T-006)            |
+| `npm run eval`                               | Run the golden set and print accuracy metrics (planned, T-020) |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Knowledge base
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Summaries of public Bankmonitor articles, written in our own words; every document's front matter links to its source article. This is a demo dataset, not Bankmonitor's internal knowledge.
