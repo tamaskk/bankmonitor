@@ -50,3 +50,4 @@ Maintainer notes (block comments are stripped from Claude's context):
 - `next dev` re-adds the Next.js block at the end of AGENTS.md. Keep it; do not delete it.
 - Scripts under `scripts/` must load `.env.local` themselves (`dotenv`); `tsx` does not.
 - The Supabase transaction pooler (port 6543) needs `prepare: false`; migrations use the session pooler URL (`DATABASE_URL_SESSION`).
+- The validate-bash hook blocks reading or sourcing `.env*`, so the plan's `set -a; source .env.local` test commands are mine to run. In scripts use `node --env-file=.env.local …` or dotenv. The hook also matches such text inside a Bash command (e.g. writing it with `printf`); edit files with Edit/Write instead.
