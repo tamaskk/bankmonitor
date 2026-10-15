@@ -22,7 +22,7 @@ Customer data (names, tax ids, account numbers) must never be needed. The UI dis
 ## 03 Authentication and authorization
 
 - Basic Auth in `src/proxy.ts` on every route except Next.js static assets. Credentials from `DEMO_USER` / `DEMO_PASSWORD`; if either is missing the proxy returns 500 (fail closed).
-- Compare credentials with `crypto.timingSafeEqual` after a length check. Split on the first `:` only.
+- Compare SHA-256 digests of both sides with `crypto.timingSafeEqual` (equal lengths, so neither content nor length leaks), user and password always both. Decode the header as UTF-8 (`Buffer`, not `atob`). Split on the first `:` only.
 - 401 responses carry `WWW-Authenticate: Basic realm="kb-assistant", charset="UTF-8"`.
 - No roles. Everyone with the password has the same access.
 

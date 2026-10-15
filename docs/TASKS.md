@@ -18,10 +18,10 @@ Derived from docs/PRD.md §05 and docs/planning/demo-gap-analysis.hu.md (task nu
 - [x] T-013 (F2) Shared `answerQuestion` pipeline generator (`src/lib/pipeline.ts`)
 - [x] T-014 (F2) Streaming NDJSON chat endpoint (`src/app/api/chat/route.ts`)
 - [x] T-015 (F3) Bank list endpoint; with `cacheComponents` drop `dynamic = 'force-dynamic'` and call `await connection()` before the query (see `node_modules/next/dist/docs/01-app/02-guides/migrating-to-cache-components.md`) (`src/app/api/banks/route.ts`)
-- [ ] T-018 Basic Auth proxy (`src/proxy.ts`); decide whether `/api/health` is excluded
+- [x] T-018 Basic Auth proxy (`src/proxy.ts`); `/api/health` stays behind Basic Auth (smoke check uses `curl -u`)
 - [x] T-016 (F2, F3, F6) Chat UI with filters and history (`src/app/page.tsx`, `src/components/chat/filter-bar.tsx`, `chat-input.tsx`)
 - [x] T-017 (F4, F5) Answer view, markers and source cards (`src/components/chat/answer-view.tsx`, `source-card.tsx`)
-- [ ] T-019 Vitest unit tests: validate (6), rrf (4), chunk (4)
+- [x] T-019 Vitest unit tests: validate, rrf and chunk spec cases (plus proxy, prompt, query, loader, chat); all run without `.env.local`; mutation check on `normalize` fails as it should
 - [ ] T-020 (F7) Eval script, threshold tuning, `eval/results.json`
 - [ ] T-021 Public GitHub repo `kb-assistant`, `vercel.json` with `fra1`, Vercel env, deploy
 - [ ] T-022 README: what, Mermaid architecture, accuracy layers, decisions, eval results, local setup
