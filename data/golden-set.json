@@ -23,7 +23,11 @@
     "question": "Mennyi a maximális futamidő?",
     "product": "lakashitel",
     "bank": null,
-    "expected_sources": ["lakashitel-alapok"],
+    "expected_sources": [
+      "lakashitel-alapok",
+      "otthon-start",
+      "cib-bank-fix-kamatozasu-lakashitel"
+    ],
     "answerable": true
   },
   {

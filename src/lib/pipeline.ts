@@ -94,7 +94,7 @@ export async function* answerQuestion(
     // 4. Stream the first attempt; the text is shown as unverified until `final`.
     const stream = streamText({
       ...generationOptions(),
-      prompt: buildUserPrompt(query, sources),
+      prompt: buildUserPrompt(query, sources, input.filters),
       abortSignal: signal,
     });
     let lastPartial: unknown;
@@ -117,7 +117,7 @@ export async function* answerQuestion(
       );
       const retry = await generateText({
         ...generationOptions(),
-        prompt: buildRetryPrompt(query, sources, attempt.errors),
+        prompt: buildRetryPrompt(query, sources, attempt.errors, input.filters),
         abortSignal: signal,
       }).catch((error: unknown) => ({ output: undefined, error }));
       attempt = checkOutput(retry.output, sources);
