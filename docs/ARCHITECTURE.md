@@ -8,7 +8,7 @@ The database is MongoDB Atlas, not the Supabase Postgres described in the planni
 
 ```
 Browser (loan expert)
-    |  Basic Auth (src/proxy.ts)
+    |  login wall (src/proxy.ts): /login form -> signed session cookie
     v
 Next.js app on Vercel (fra1)
     |-- page.tsx: chat UI, client-side history
@@ -47,7 +47,7 @@ Query pipeline (`src/lib/pipeline.ts`): rewrite → embed → hybrid search (`$v
 | Models          | Generation `gpt-5.5`; rerank and rewrite `gpt-5.4-mini`; embeddings `text-embedding-3-small` (1536) | All configurable by env; reasoning effort `low`                                                         |
 | Reranker        | LLM rerank, 0–10 scale, threshold `RERANK_THRESHOLD` (default 6)                                    | No extra vendor; the score doubles as the refusal threshold                                             |
 | Validation      | Zod (env, front matter, request bodies, model output shape)                                         | One schema library everywhere                                                                           |
-| Auth            | Basic Auth in `src/proxy.ts`, credentials in env                                                    | Public URL and public repo; SSO is out of scope                                                         |
+| Auth            | Login page + signed session cookie, checked in `src/proxy.ts`; credentials in env                   | Public URL and public repo; SSO is out of scope                                                         |
 | Hosting         | Vercel, region `fra1`, Git integration                                                              | Next to the Atlas region                                                                                |
 | Testing         | Vitest (pure modules) + eval script on the golden set                                               | Unit tests guard the validator; the eval measures accuracy. No Playwright in the demo                   |
 
@@ -66,13 +66,15 @@ Do not add a dependency that overlaps with a row in this table without asking.
   scripts/                 load-env.ts (import first), db-check.ts, create-indexes.ts, ingest.ts, search-check.ts, rerank-check.ts, rewrite-check.ts, generate-check.ts, pipeline-check.ts, eval.ts (local only; run via npm scripts with --conditions=react-server)
   tests/                   Vitest unit tests (*.test.ts)
   src/
-    proxy.ts               Basic Auth for every route
+    proxy.ts               login wall for every route (session cookie, or Basic for scripts)
     instrumentation.ts     validates env at server start (not during build)
     app/
       page.tsx             chat UI (client component)
       api/chat/route.ts    POST, NDJSON stream of PipelineEvent
       api/banks/route.ts   GET, distinct banks from chunks
       api/health/route.ts  GET, { status: "ok" }
+      api/login/route.ts   POST form -> session cookie; api/logout/route.ts clears it
+      login/page.tsx       login form (components/auth/login-form.tsx)
     components/
       ui/                  shadcn primitives + empty-state (DESIGN_SYSTEM.md §06)
       chat/                chat (client entry), use-chat (state, NDJSON fetch), filter-bar, chat-input, answer-view, source-card; pure helpers: chat-state, events (Zod stream schema), ndjson, answer-text
@@ -80,6 +82,7 @@ Do not add a dependency that overlaps with a row in this table without asking.
       client.ts            cached MongoClient promise on globalThis (failed connects not cached), getClient(), getDb()
       types.ts             collection names, PRODUCTS, DocumentRecord, ChunkRecord, search index definitions
     lib/
+      auth/session.ts      session token sign/verify, credential compare (no client imports)
       env.ts               Zod-validated env, server-only
       embeddings.ts        embedTexts, embedQuery, chunkEmbeddingInput (header + content)
       openai.ts            the one OpenAI provider, bound to env.OPENAI_API_KEY
@@ -115,7 +118,7 @@ Where new code belongs:
 Chat request:
 
 1. `page.tsx` sends `{ question, product, bank, history }` (history: last 6 turns, final answers only).
-2. `src/proxy.ts` checks Basic Auth.
+2. `src/proxy.ts` checks the session cookie (or Basic credentials from scripts).
 3. `/api/chat` validates the body with Zod (question ≤ 1000 chars, history ≤ 6 items) and returns 400 on failure.
 4. `answerQuestion()` yields events: `rewrite?`, `partial*`, then exactly one `final` or `error`.
 5. The route writes each event as one NDJSON line and stops the generator when the client aborts.
@@ -178,13 +181,13 @@ The agent must not "fix" these.
 - When the validator rejects good answers, tighten the prompt's quoting rule. Do not loosen the validator.
 - Conversation history lives in the client and is resent with each request. No conversation collections.
 - Ingest never runs on Vercel. The local script writes to the same Atlas cluster production reads.
-- Basic Auth protects every route, including the API, even though it is "only a demo": the URL and repo are public and the OpenAI key is real.
+- A login wall protects every route, including the API, even though it is "only a demo": the URL and repo are public and the OpenAI key is real. It is a login page with a signed cookie, not HTTP Basic Auth: the browser's own Basic dialog was confusing and Chrome could get stuck on cached wrong credentials (`ERR_TOO_MANY_RETRIES`). The session key derives from the credentials, so no extra env variable is needed.
 - File names are kebab-case (`source-card.tsx`), unlike the PascalCase names in the planning document.
 
 ## 07 Scalability and future considerations
 
 - Expected scale: one demo session, a handful of users, 12–15 documents, under 100 chunks. Build for this; M0 limits (512 MB storage, 3 search indexes, shared resources) are far away.
-- Known limits: one question takes 10–25 s (`maxDuration = 60`); search indexes are eventually consistent (seconds after a write); M0 clusters pause after long inactivity; no rate limiting beyond Basic Auth.
+- Known limits: one question takes 10–25 s (`maxDuration = 60`); search indexes are eventually consistent (seconds after a write); M0 clusters pause after long inactivity; no rate limiting beyond the login wall and a 500 ms delay after a failed login.
 - Planned next (production plan): NestJS backend, SSO and roles, versioned documents with validity dates, number validation, feedback, Langfuse, eval in CI, live rates via tool calling. The production plan's database choice (Postgres) is open again after this change.
 - Not planned for the demo: multi-tenant, document upload, background jobs. Do not add abstractions for these.
 

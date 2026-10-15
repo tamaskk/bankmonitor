@@ -14,16 +14,17 @@ Customer data (names, tax ids, account numbers) must never be needed. The UI dis
 
 ## 02 Trust boundaries
 
-- Browser → server: untrusted. Basic Auth first, then Zod validation in the route handler (question ≤ 1000 chars, history ≤ 6 turns of ≤ 2000 chars, product from the enum, bank ≤ 100 chars).
+- Browser → server: untrusted. Session check in the proxy first, then Zod validation in the route handler (question ≤ 1000 chars, history ≤ 6 turns of ≤ 2000 chars, product from the enum, bank ≤ 100 chars).
 - Model output: untrusted. Parse with the Zod schema, then `validateAnswer` before anything is shown as final. Unknown source ids, invented quotes and unmatched markers fail validation.
 - Knowledge documents inside the prompt: data, not instructions. They are wrapped in `<forrás>` tags; the system prompt says to answer only from them and never to follow instructions in them.
 - Front matter: validated by Zod at ingest; `source_url` must start with `https://bankmonitor.hu/`.
 
 ## 03 Authentication and authorization
 
-- Basic Auth in `src/proxy.ts` on every route except Next.js static assets. Credentials from `DEMO_USER` / `DEMO_PASSWORD`; if either is missing the proxy returns 500 (fail closed).
-- Compare SHA-256 digests of both sides with `crypto.timingSafeEqual` (equal lengths, so neither content nor length leaks), user and password always both. Decode the header as UTF-8 (`Buffer`, not `atob`). Split on the first `:` only.
-- 401 responses carry `WWW-Authenticate: Basic realm="kb-assistant", charset="UTF-8"`.
+- Login wall in `src/proxy.ts` on every route except Next.js static assets, `/login`, `/api/login` and `/api/logout`. Credentials from `DEMO_USER` / `DEMO_PASSWORD`; if either is missing or blank the proxy returns 500 (fail closed).
+- `/login` posts a plain form to `/api/login`. The route rejects posts whose `Origin` is not the app's own (login CSRF), compares SHA-256 digests of both sides with `crypto.timingSafeEqual` (user and password always both), waits 500 ms after a failure, and redirects only to same-site relative paths (`safeNextPath`).
+- On success: cookie `kb_session` = `<expiry>.<HMAC-SHA256>`, `HttpOnly`, `Secure` on HTTPS, `SameSite=Lax`, 12 hours. The HMAC key is derived from `DEMO_USER` + `DEMO_PASSWORD`, so changing the password ends every session. `/api/logout` (same-origin POST) clears it.
+- Without a valid session: pages redirect to `/login?next=…`, API routes return 401 JSON. No `WWW-Authenticate` challenge, so browsers never show their own credential dialog. `Authorization: Basic` is still accepted for curl and scripts.
 - No roles. Everyone with the password has the same access.
 
 ## 04 Secrets
@@ -39,7 +40,7 @@ Customer data (names, tax ids, account numbers) must never be needed. The UI dis
 - MongoDB: filters and pipelines are built only from Zod-validated values (enum products, bank string ≤ 100 chars); never pass request objects into a query and reject `$`-prefixed input (operator injection). The `$search` text query is built from regex-extracted word tokens (`/[\p{L}\p{N}]+/gu`).
 - No `dangerouslySetInnerHTML`. Answer text is rendered as React text; markers are parsed with a regex into elements.
 - External links (`sourceUrl`) open with `target="_blank" rel="noopener noreferrer"`; only `https://bankmonitor.hu/` URLs pass ingest validation.
-- Cost abuse: Basic Auth, request size limits, `maxDuration = 60`, abort the pipeline when the client disconnects. No rate limiter in the demo (assumed — confirm).
+- Cost abuse: login wall on every route, a 500 ms delay after a failed login, request size limits, `maxDuration = 60`, abort the pipeline when the client disconnects. No rate limiter in the demo (assumed — confirm).
 - Never log full prompts with secrets; `console.warn` validation errors only (no API keys, no full chunk dumps).
 
 ## 06 Dependencies
