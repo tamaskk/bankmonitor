@@ -17,7 +17,7 @@ Derived from docs/PRD.md §05 and docs/planning/demo-gap-analysis.hu.md (task nu
 - [x] T-012 (F4, F5) Citation validator, one retry, not_found (`src/lib/generation/validate.ts`)
 - [x] T-013 (F2) Shared `answerQuestion` pipeline generator (`src/lib/pipeline.ts`)
 - [ ] T-014 (F2) Streaming NDJSON chat endpoint (`src/app/api/chat/route.ts`)
-- [ ] T-015 (F3) Bank list endpoint; with `cacheComponents` drop `dynamic = 'force-dynamic'` and call `await connection()` before the query (see `node_modules/next/dist/docs/01-app/02-guides/migrating-to-cache-components.md`) (`src/app/api/banks/route.ts`)
+- [x] T-015 (F3) Bank list endpoint; with `cacheComponents` drop `dynamic = 'force-dynamic'` and call `await connection()` before the query (see `node_modules/next/dist/docs/01-app/02-guides/migrating-to-cache-components.md`) (`src/app/api/banks/route.ts`)
 - [ ] T-018 Basic Auth proxy (`src/proxy.ts`); decide whether `/api/health` is excluded
 - [ ] T-016 (F2, F3, F6) Chat UI with filters and history (`src/app/page.tsx`, `src/components/chat/filter-bar.tsx`, `chat-input.tsx`)
 - [ ] T-017 (F4, F5) Answer view, markers and source cards (`src/components/chat/answer-view.tsx`, `source-card.tsx`)
