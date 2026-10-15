@@ -40,6 +40,7 @@ type ItemResult = {
   recallHit: boolean | null;
   citations: number;
   correctCitations: number;
+  cited: string[];
   retrieved: string[];
   seconds: number;
   answer: string;
@@ -88,6 +89,7 @@ async function main() {
       citations: citations.length,
       correctCitations: citations.filter((c) => expected.has(c.source.slug))
         .length,
+      cited: citations.map((c) => c.source.slug),
       retrieved,
       seconds,
       answer: final?.answer ?? errorMessage,
