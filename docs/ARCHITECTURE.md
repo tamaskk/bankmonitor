@@ -63,7 +63,7 @@ Do not add a dependency that overlaps with a row in this table without asking.
     docs/*.md              knowledge base: Bankmonitor articles summarised, with front matter
     golden-set.json        15 eval questions
   eval/results.json        latest eval run (committed, quoted by the README)
-  scripts/                 create-indexes.ts, ingest.ts, eval.ts, *-check.ts (local only; load .env.local with dotenv)
+  scripts/                 load-env.ts (import first), db-check.ts, create-indexes.ts, ingest.ts, eval.ts (local only; run via npm scripts with --conditions=react-server)
   tests/                   Vitest unit tests (*.test.ts)
   src/
     proxy.ts               Basic Auth for every route
@@ -77,7 +77,7 @@ Do not add a dependency that overlaps with a row in this table without asking.
       ui/                  shadcn primitives + empty-state (DESIGN_SYSTEM.md §06)
       chat/                filter-bar, chat-input, answer-view, source-card
     db/
-      client.ts            cached MongoClient (globalThis), getDb()
+      client.ts            cached MongoClient promise on globalThis (failed connects not cached), getClient(), getDb()
       collections.ts       document types, collection accessors, index and search index definitions
     lib/
       env.ts               Zod-validated env, server-only
