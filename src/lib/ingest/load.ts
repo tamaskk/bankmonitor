@@ -5,14 +5,7 @@ import path from "node:path";
 import matter from "gray-matter";
 import { z } from "zod";
 
-export const PRODUCTS = [
-  "lakashitel",
-  "szemelyi_kolcson",
-  "bankszamla",
-  "altalanos",
-] as const;
-
-export type Product = (typeof PRODUCTS)[number];
+import { PRODUCTS, type Product } from "@/db/types";
 
 // YAML turns an unquoted 2026-01-31 into a Date at UTC midnight (and silently
 // rolls an impossible 2026-02-30 over to March); a Date with a time part would
