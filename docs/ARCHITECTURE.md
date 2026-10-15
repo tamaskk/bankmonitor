@@ -40,7 +40,7 @@ Query pipeline (`src/lib/pipeline.ts`): rewrite → embed → hybrid search (`$v
 | Backend         | Route handlers (`runtime = 'nodejs'`)                                                               | The MongoDB driver needs Node.js                                                                        |
 | Database        | MongoDB Atlas free M0 cluster, AWS Frankfurt (`eu-central-1`); no local database                    | Free, EU, reachable from Vercel; vector and full-text search in the same cluster                        |
 | Data access     | Official `mongodb` Node.js driver (v7), no ODM                                                      | Aggregation pipelines with `$vectorSearch` / `$search` are the whole query layer; an ODM adds nothing   |
-| Vector search   | Atlas Vector Search, cosine, 1536 dimensions, `products` / `banks` / `bankGeneral` as filter fields | Pre-filtering inside the index                                                                          |
+| Vector search   | Atlas Vector Search, cosine, 1536 dimensions, `products` / `banks` as filter fields                 | Pre-filtering inside the index                                                                          |
 | Full-text       | Atlas Search with the `lucene.hungarian` analyzer                                                   | Hungarian stemming; exact terms (THM, bank names) that vector search misses                             |
 | Hybrid merge    | RRF in TypeScript over the two result lists                                                         | Native `$rankFusion` runs its sub-pipelines sequentially and its M0 support is not documented           |
 | LLM integration | Vercel AI SDK (`ai` v7, `@ai-sdk/openai`) with structured output                                    | Provider-independent, streaming, Zod schemas. The plan targeted v6: verify the API before coding        |
@@ -78,7 +78,7 @@ Do not add a dependency that overlaps with a row in this table without asking.
       chat/                filter-bar, chat-input, answer-view, source-card
     db/
       client.ts            cached MongoClient promise on globalThis (failed connects not cached), getClient(), getDb()
-      collections.ts       document types, collection accessors, index and search index definitions
+      types.ts             collection names, DocumentRecord, ChunkRecord, search index definitions
     lib/
       env.ts               Zod-validated env, server-only
       embeddings.ts        embedTexts, embedQuery
@@ -91,15 +91,15 @@ Do not add a dependency that overlaps with a row in this table without asking.
 
 Data model (two collections in database `MONGODB_DB`):
 
-| Collection  | Fields                                                                                                                                                                                                       | Indexes                                                                       |
-| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------- |
-| `documents` | `_id`, `slug`, `title`, `products[]`, `banks[]`, `sourceUrl`, `updatedAt` (YYYY-MM-DD), `contentHash`, `createdAt`                                                                                           | unique `slug`                                                                 |
-| `chunks`    | `_id`, `documentId`, `slug`, `ordinal`, `sectionPath`, `contextHeader`, `content`, `products[]`, `banks[]`, `bankGeneral` (true when `banks` is empty), `title`, `sourceUrl`, `updatedAt`, `embedding[1536]` | `documentId`; vector search index `chunks_vector`; search index `chunks_text` |
+| Collection  | Fields                                                                                                                                                                                     | Indexes                                                                         |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------- |
+| `documents` | `_id` (slug), `title`, `products[]`, `banks[]`, `sourceUrl`, `updatedAt` (YYYY-MM-DD), `contentHash`, `createdAt`                                                                          | `_id`                                                                           |
+| `chunks`    | `_id` (`<slug>#<ordinal>`), `documentId` (slug), `ordinal`, `sectionPath`, `contextHeader`, `content`, `products[]`, `banks[]` (`["altalanos"]` when not bank-specific), `embedding[1536]` | `documentId_1`; vector search index `chunks_vector`; search index `chunks_text` |
 
 Search indexes (M0 allows at most 3 Atlas Search + Vector Search indexes in total; we use 2):
 
-- `chunks_vector` (type `vectorSearch`): `embedding` (1536, cosine); filter fields `products`, `banks`, `bankGeneral`.
-- `chunks_text` (type `search`, `analyzer: lucene.hungarian`, static mapping): `contextHeader` and `content` as `string`; `products`, `banks` as `token`; `bankGeneral` as `boolean`.
+- `chunks_vector` (type `vectorSearch`): `embedding` (1536, cosine); filter fields `products`, `banks`.
+- `chunks_text` (type `search`, static mapping): `contextHeader` and `content` as `string` with the `lucene.hungarian` analyzer; `products`, `banks` as `token`.
 
 Where new code belongs:
 
@@ -123,7 +123,7 @@ Chat request:
 Filters, applied inside both search stages (pre-filter, never after):
 
 - Product (unless `osszes`): `products` in `[product, 'altalanos']`.
-- Bank (if given): `banks` equals the bank, or `bankGeneral` is true.
+- Bank (if given): `banks` in `[bank, "altalanos"]`.
 
 Ingestion (local): `loadDocuments()` validates every file first (all-or-nothing) → per document, skip if `contentHash` matches, otherwise replace the document and its chunks in one transaction with fresh embeddings → delete documents (and chunks) whose file is gone → wait until both search indexes report the new data as queryable before the script says done.
 
@@ -165,8 +165,9 @@ The agent must not "fix" these.
 - LLM rerank instead of a cross-encoder: no extra vendor, and the score is the refusal threshold. Results below `RERANK_THRESHOLD` are dropped even if that leaves nothing.
 - Output schemas have no Zod `min` / `max`: OpenAI strict structured output rejects some JSON Schema keywords. Range checks happen in code.
 - Two separate queries plus RRF in TypeScript, not `$rankFusion`: the two run in parallel, and `$rankFusion` support on M0 is not documented.
-- Document fields (`title`, `slug`, `sourceUrl`, `updatedAt`, `products`, `banks`) are copied onto every chunk. Search results need them, and a `$lookup` after `$vectorSearch` / `$search` adds latency for no gain at this scale.
-- `bankGeneral` exists only because the vector search pre-filter cannot reliably express "the `banks` array is empty". Keep it in sync with `banks` at ingest.
+- Chunks carry only `products` and `banks` from their document. Display fields (`title`, `sourceUrl`, `updatedAt`) are read from `documents` by `_id` (one `find` with `$in` over the reranked slugs), not copied onto chunks.
+- Bank-independent documents store `banks: ["altalanos"]` in the database (front matter keeps `banks: []`; the ingest maps it): the vector search pre-filter cannot express "empty array". `altalanos` never appears in the bank list (`/api/banks`).
+- String `_id`s are deterministic (`slug`, `<slug>#<ordinal>`): re-running the ingest cannot create duplicates, and the eval and debugging work with slugs directly.
 - Full-text uses the `text` operator over `contextHeader` and `content`, which matches any term (OR semantics). Do not switch to `phrase` or require all terms: natural questions would return nothing; RRF and rerank fix the ranking.
 - `numCandidates: 200` for `limit: 20` (the documented ≥ 20× guideline): filtered vector queries need the extra candidates.
 - One `MongoClient` cached on `globalThis`, small pool (`maxPoolSize: 5`): serverless functions and hot reload must not open a new pool per request.
