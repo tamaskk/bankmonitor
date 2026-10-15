@@ -5,8 +5,8 @@ Derived from docs/PRD.md §05 and docs/planning/demo-gap-analysis.hu.md (task nu
 ## Now
 
 - [ ] T-000 (F1, F7) Write the inputs: 12–15 `data/docs/*.md` from public Bankmonitor articles (own words, front matter `title`, `products`, `banks`, `source_url`, `updated_at`, `##` sections) and `data/golden-set.json` (15 questions, 4 unanswerable)
-- [ ] T-002 (F1) Supabase project in Frankfurt, `src/db/client.ts`, `scripts/db-check.ts` prints Hungarian lexemes
-- [ ] T-003 (F1) Drizzle schema (`documents`, `chunks`, HNSW + GIN indexes), `enable_vector` custom migration, `init` migration
+- [ ] T-002 (F1) Atlas M0 cluster in AWS Frankfurt, database user (readWrite on `kb_assistant`), network access for Vercel, `src/db/client.ts`, `scripts/db-check.ts` pings the cluster
+- [ ] T-003 (F1) `src/db/collections.ts` and idempotent `npm run db:setup`: unique `slug`, `documentId` index, `chunks_vector` (1536, cosine, filters `products`, `banks`, `bankGeneral`) and `chunks_text` (`lucene.hungarian`) search indexes
 
 ## Next
 

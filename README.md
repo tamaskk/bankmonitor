@@ -18,7 +18,7 @@ An internal RAG assistant demo for Bankmonitor loan experts: ask a question in H
 
 ## Stack
 
-Next.js 16 (App Router) · TypeScript · Tailwind CSS v4 + shadcn/ui · Supabase Postgres with pgvector and Hungarian full-text search · Drizzle ORM · Vercel AI SDK + OpenAI · Vitest · Vercel.
+Next.js 16 (App Router) · TypeScript · Tailwind CSS v4 + shadcn/ui · MongoDB Atlas (Vector Search + Atlas Search with the Hungarian analyzer) · Vercel AI SDK + OpenAI · Vitest · Vercel.
 
 ## Run locally
 
@@ -32,17 +32,17 @@ npm run dev                  # http://localhost:3000
 
 ## Scripts
 
-| Script                                       | What it does                                                   |
-| -------------------------------------------- | -------------------------------------------------------------- |
-| `npm run dev`                                | Development server                                             |
-| `npm run build` / `npm run start`            | Production build / server                                      |
-| `npm run lint`                               | ESLint                                                         |
-| `npm run typecheck`                          | `next typegen` + `tsc --noEmit`                                |
-| `npm run test` / `npm run test:watch`        | Vitest unit tests                                              |
-| `npm run format` / `npm run format:check`    | Prettier                                                       |
-| `npm run db:generate` / `npm run db:migrate` | Drizzle migrations (planned, T-003)                            |
-| `npm run ingest`                             | Load `data/docs` into the database (planned, T-006)            |
-| `npm run eval`                               | Run the golden set and print accuracy metrics (planned, T-020) |
+| Script                                    | What it does                                                          |
+| ----------------------------------------- | --------------------------------------------------------------------- |
+| `npm run dev`                             | Development server                                                    |
+| `npm run build` / `npm run start`         | Production build / server                                             |
+| `npm run lint`                            | ESLint                                                                |
+| `npm run typecheck`                       | `next typegen` + `tsc --noEmit`                                       |
+| `npm run test` / `npm run test:watch`     | Vitest unit tests                                                     |
+| `npm run format` / `npm run format:check` | Prettier                                                              |
+| `npm run db:setup`                        | Create collections, indexes and Atlas search indexes (planned, T-003) |
+| `npm run ingest`                          | Load `data/docs` into the database (planned, T-006)                   |
+| `npm run eval`                            | Run the golden set and print accuracy metrics (planned, T-020)        |
 
 ## Knowledge base
 
