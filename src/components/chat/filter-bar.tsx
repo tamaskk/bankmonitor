@@ -95,7 +95,7 @@ export function FilterBar({
         >
           <SelectTrigger
             aria-labelledby="product-filter-label"
-            className="w-full sm:w-48"
+            className="w-full data-[size=default]:h-11 sm:w-48 sm:data-[size=default]:h-8"
           >
             <SelectValue />
           </SelectTrigger>
@@ -126,7 +126,7 @@ export function FilterBar({
         >
           <SelectTrigger
             aria-labelledby="bank-filter-label"
-            className="w-full sm:w-48"
+            className="w-full data-[size=default]:h-11 sm:w-48 sm:data-[size=default]:h-8"
           >
             <SelectValue />
           </SelectTrigger>
@@ -147,7 +147,7 @@ export function FilterBar({
 
       <Button
         variant="outline"
-        className="sm:ml-auto"
+        className="h-11 sm:ml-auto sm:h-8"
         onClick={onNewConversation}
         disabled={!canReset}
       >
