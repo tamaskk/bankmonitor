@@ -25,7 +25,7 @@ Derived from docs/PRD.md §05 and docs/planning/demo-gap-analysis.hu.md (task nu
 - [x] T-019 Vitest unit tests: validate, rrf and chunk spec cases (plus proxy, prompt, query, loader, chat); all run without `.env.local`; mutation check on `normalize` fails as it should
 - [x] T-020 (F7) Eval script and `eval/results.json`: recall@5, citation accuracy, correct refusal and answer rate all 100% at RERANK_THRESHOLD=6 (no threshold change needed)
 - [x] T-021 Public GitHub repo `tamaskk/bankmonitor`, `vercel.json` with `fra1`, Vercel env, deploy — live at https://bankmonitor.vercel.app (fra1): 401 without credentials, /api/banks 200, a question answered with citations, no function errors
-- [ ] T-022 README: what, Mermaid architecture, accuracy layers, decisions, eval results, local setup
+- [x] T-022 README: what, Mermaid architecture, accuracy layers, decisions, eval results, local setup
 - [ ] T-023 Rehearsal of the 7 scenarios on the live URL, screen recording as a fallback
 
 ## Later (after v1)
