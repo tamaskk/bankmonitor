@@ -63,7 +63,7 @@ Do not add a dependency that overlaps with a row in this table without asking.
     docs/*.md              knowledge base: Bankmonitor articles summarised, with front matter
     golden-set.json        15 eval questions
   eval/results.json        latest eval run (committed, quoted by the README)
-  scripts/                 load-env.ts (import first), db-check.ts, create-indexes.ts, ingest.ts, eval.ts (local only; run via npm scripts with --conditions=react-server)
+  scripts/                 load-env.ts (import first), db-check.ts, create-indexes.ts, ingest.ts, search-check.ts, eval.ts (local only; run via npm scripts with --conditions=react-server)
   tests/                   Vitest unit tests (*.test.ts)
   src/
     proxy.ts               Basic Auth for every route
@@ -78,14 +78,14 @@ Do not add a dependency that overlaps with a row in this table without asking.
       chat/                filter-bar, chat-input, answer-view, source-card
     db/
       client.ts            cached MongoClient promise on globalThis (failed connects not cached), getClient(), getDb()
-      types.ts             collection names, DocumentRecord, ChunkRecord, search index definitions
+      types.ts             collection names, PRODUCTS, DocumentRecord, ChunkRecord, search index definitions
     lib/
       env.ts               Zod-validated env, server-only
       embeddings.ts        embedTexts, embedQuery, chunkEmbeddingInput (header + content)
       openai.ts            the one OpenAI provider, bound to env.OPENAI_API_KEY
       pipeline.ts          answerQuestion(): the only orchestrator
       ingest/              load.ts (front matter), chunk.ts (pure)
-      retrieval/           types.ts, search.ts, rrf.ts (pure), rerank.ts, rewrite.ts
+      retrieval/           types.ts, query.ts (pure: filter schema, word tokens), search.ts, rrf.ts (pure), rerank.ts, rewrite.ts
       generation/          schema.ts, prompt.ts, validate.ts (pure)
       utils.ts             cn() for class names
 ```

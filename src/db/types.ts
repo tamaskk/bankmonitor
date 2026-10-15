@@ -9,6 +9,18 @@ export const COLLECTIONS = {
 
 export const EMBEDDING_DIMENSIONS = 1536;
 
+// Product codes in front matter, chunk tags and the product filter. Here and
+// not in the loader, so the search filter schema does not pull in the
+// loader's file-system and YAML dependencies.
+export const PRODUCTS = [
+  "lakashitel",
+  "szemelyi_kolcson",
+  "bankszamla",
+  "altalanos",
+] as const;
+
+export type Product = (typeof PRODUCTS)[number];
+
 // Stored in `banks` for documents not tied to a bank: the $vectorSearch
 // pre-filter cannot express "empty array". Front matter keeps `banks: []`;
 // the ingest maps it. Never shown in the bank list.
