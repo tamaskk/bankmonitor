@@ -4,11 +4,11 @@ Read before changing auth, data handling, secrets, prompts or anything that reac
 
 ## 01 What we protect
 
-| Data                         | Examples                                                   | Sensitivity                                         | Where stored                         | Retention                                                            |
-| ---------------------------- | ---------------------------------------------------------- | --------------------------------------------------- | ------------------------------------ | -------------------------------------------------------------------- |
-| API and database credentials | `OPENAI_API_KEY`, `DATABASE_URL*`, `DEMO_PASSWORD`         | Secret: a leak costs money and exposes the database | `.env.local`, Vercel env             | Until rotated                                                        |
-| Knowledge base               | `data/docs/*.md` (public Bankmonitor articles, summarised) | Public, but must be accurate                        | Git, Supabase `documents` / `chunks` | Until removed from `data/docs`                                       |
-| User questions               | Free text typed by the expert                              | May accidentally contain client data                | Sent to OpenAI; not stored by us     | Not persisted (no logs of question text beyond Vercel function logs) |
+| Data                         | Examples                                                   | Sensitivity                                         | Where stored                      | Retention                                                            |
+| ---------------------------- | ---------------------------------------------------------- | --------------------------------------------------- | --------------------------------- | -------------------------------------------------------------------- |
+| API and database credentials | `OPENAI_API_KEY`, `MONGODB_URI`, `DEMO_PASSWORD`           | Secret: a leak costs money and exposes the database | `.env.local`, Vercel env          | Until rotated                                                        |
+| Knowledge base               | `data/docs/*.md` (public Bankmonitor articles, summarised) | Public, but must be accurate                        | Git, Atlas `documents` / `chunks` | Until removed from `data/docs`                                       |
+| User questions               | Free text typed by the expert                              | May accidentally contain client data                | Sent to OpenAI; not stored by us  | Not persisted (no logs of question text beyond Vercel function logs) |
 
 Customer data (names, tax ids, account numbers) must never be needed. The UI disclaimer and the README say so; PII detection is out of scope for the demo.
 
@@ -32,11 +32,11 @@ Customer data (names, tax ids, account numbers) must never be needed. The UI dis
 - The repository is public: before every push, `git ls-files | grep -i '\.env'` lists only `.env.example`, and `git grep -n 'sk-'` is empty.
 - The demo password goes to the interviewer in a separate message.
 - Set a monthly spending limit on the OpenAI project.
-- Rotation: the repo owner (@tamas) rotates in the OpenAI dashboard / Supabase dashboard, then updates Vercel env and `.env.local`.
+- Rotation: the repo owner (@tamas) rotates in the OpenAI dashboard / Atlas (Database Access), then updates Vercel env and `.env.local`.
 
 ## 05 Input, output, injection
 
-- SQL: only the Drizzle query builder or the `sql` template with interpolated parameters. Never `sql.raw()` or string concatenation with request data. The full-text OR query is built from regex-extracted word tokens (`/[\p{L}\p{N}]+/gu`) and still passed as a parameter.
+- MongoDB: filters and pipelines are built only from Zod-validated values (enum products, bank string ≤ 100 chars); never pass request objects into a query and reject `$`-prefixed input (operator injection). The `$search` text query is built from regex-extracted word tokens (`/[\p{L}\p{N}]+/gu`).
 - No `dangerouslySetInnerHTML`. Answer text is rendered as React text; markers are parsed with a regex into elements.
 - External links (`sourceUrl`) open with `target="_blank" rel="noopener noreferrer"`; only `https://bankmonitor.hu/` URLs pass ingest validation.
 - Cost abuse: Basic Auth, request size limits, `maxDuration = 60`, abort the pipeline when the client disconnects. No rate limiter in the demo (assumed — confirm).
@@ -50,4 +50,4 @@ Customer data (names, tax ids, account numbers) must never be needed. The UI dis
 ## 07 Incident basics
 
 - Contact: the repo owner (@tamas).
-- A leaked secret: rotate first (OpenAI key, Supabase database password, demo password), update Vercel and `.env.local`, then remove it from git history. A public repo means assume it was already harvested.
+- A leaked secret: rotate first (OpenAI key, Atlas database user password, demo password), update Vercel and `.env.local`, then remove it from git history. A public repo means assume it was already harvested.

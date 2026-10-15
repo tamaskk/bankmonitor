@@ -2,6 +2,8 @@
 
 The demo architecture. The production target (NestJS, SSO, job queue, Langfuse) is described in [docs/planning/solution-design.hu.md](planning/solution-design.hu.md); the task-level design with acceptance criteria is [docs/planning/demo-gap-analysis.hu.md](planning/demo-gap-analysis.hu.md). Most of the code below is still planned: see docs/TASKS.md for what exists.
 
+The database is MongoDB Atlas, not the Supabase Postgres described in the planning document. Where the planning document's database-specific sections (tasks 2, 3, 6, 7, 15, 21: Supabase, Drizzle, pgvector, `tsvector`, SQL) disagree with this file, this file wins; the rest of those tasks (inputs, outputs, acceptance criteria) still applies.
+
 ## 01 System overview
 
 ```
@@ -14,14 +16,16 @@ Next.js app on Vercel (fra1)
     |-- GET  /api/banks
     |
     +--> OpenAI API: embeddings, rerank, query rewrite, generation
-    +--> Supabase Postgres (Frankfurt): pgvector + hungarian full-text
+    +--> MongoDB Atlas M0 (AWS Frankfurt, eu-central-1):
+           Atlas Vector Search + Atlas Search (lucene.hungarian)
 
 Local machine only:
-    scripts/ingest.ts  data/docs/*.md --> chunks + embeddings --> Supabase
-    scripts/eval.ts    data/golden-set.json --> pipeline --> eval/results.json
+    scripts/setup-db.ts  collections, indexes, search indexes (idempotent)
+    scripts/ingest.ts    data/docs/*.md --> chunks + embeddings --> Atlas
+    scripts/eval.ts      data/golden-set.json --> pipeline --> eval/results.json
 ```
 
-Query pipeline (`src/lib/pipeline.ts`): rewrite → embed → hybrid search (vector + full-text, filtered) → RRF → LLM rerank + threshold → generate (streamed, structured) → validate citations → retry once → final answer or not_found.
+Query pipeline (`src/lib/pipeline.ts`): rewrite → embed → hybrid search (`$vectorSearch` and `$search`, both pre-filtered, in parallel) → RRF in TypeScript → LLM rerank + threshold → generate (streamed, structured) → validate citations → retry once → final answer or not_found.
 
 - Users only interact with the Next.js app. The browser never reaches OpenAI or the database.
 - Third-party calls happen on the server only. Keys never reach the client.
@@ -33,16 +37,18 @@ Query pipeline (`src/lib/pipeline.ts`): rewrite → embed → hybrid search (vec
 | --------------- | --------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
 | Frontend        | Next.js 16 App Router, React 19, TypeScript strict                                                  | One app for UI and API; a separate NestJS backend is the production plan, not needed for a one-day demo |
 | Styling         | Tailwind v4 + shadcn/ui (`base-nova`), tokens from DESIGN_SYSTEM.md                                 | Fast, accessible primitives; no custom design in scope                                                  |
-| Backend         | Route handlers (`runtime = 'nodejs'`)                                                               | The `postgres` driver needs Node.js                                                                     |
-| Database        | Supabase Postgres, EU (Frankfurt), pgvector                                                         | One database for vectors, full-text, filters; reachable from Vercel, unlike a local Docker Compose      |
-| Queries         | Drizzle ORM + postgres.js; search in raw SQL via the Drizzle `sql` template                         | Typed schema and migrations; hybrid search needs SQL the query builder cannot express                   |
-| Full-text       | Postgres `hungarian` configuration, generated `tsvector` column                                     | Hungarian stemming built in; exact terms (THM, bank names) that vector search misses                    |
+| Backend         | Route handlers (`runtime = 'nodejs'`)                                                               | The MongoDB driver needs Node.js                                                                        |
+| Database        | MongoDB Atlas free M0 cluster, AWS Frankfurt (`eu-central-1`); no local database                    | Free, EU, reachable from Vercel; vector and full-text search in the same cluster                        |
+| Data access     | Official `mongodb` Node.js driver (v7), no ODM                                                      | Aggregation pipelines with `$vectorSearch` / `$search` are the whole query layer; an ODM adds nothing   |
+| Vector search   | Atlas Vector Search, cosine, 1536 dimensions, `products` / `banks` / `bankGeneral` as filter fields | Pre-filtering inside the index                                                                          |
+| Full-text       | Atlas Search with the `lucene.hungarian` analyzer                                                   | Hungarian stemming; exact terms (THM, bank names) that vector search misses                             |
+| Hybrid merge    | RRF in TypeScript over the two result lists                                                         | Native `$rankFusion` runs its sub-pipelines sequentially and its M0 support is not documented           |
 | LLM integration | Vercel AI SDK (`ai` v7, `@ai-sdk/openai`) with structured output                                    | Provider-independent, streaming, Zod schemas. The plan targeted v6: verify the API before coding        |
 | Models          | Generation `gpt-5.5`; rerank and rewrite `gpt-5.4-mini`; embeddings `text-embedding-3-small` (1536) | All configurable by env; reasoning effort `low`                                                         |
 | Reranker        | LLM rerank, 0–10 scale, threshold `RERANK_THRESHOLD` (default 6)                                    | No extra vendor; the score doubles as the refusal threshold                                             |
 | Validation      | Zod (env, front matter, request bodies, model output shape)                                         | One schema library everywhere                                                                           |
 | Auth            | Basic Auth in `src/proxy.ts`, credentials in env                                                    | Public URL and public repo; SSO is out of scope                                                         |
-| Hosting         | Vercel, region `fra1`, Git integration                                                              | Next to the Supabase region                                                                             |
+| Hosting         | Vercel, region `fra1`, Git integration                                                              | Next to the Atlas region                                                                                |
 | Testing         | Vitest (pure modules) + eval script on the golden set                                               | Unit tests guard the validator; the eval measures accuracy. No Playwright in the demo                   |
 
 Do not add a dependency that overlaps with a row in this table without asking.
@@ -56,10 +62,8 @@ Do not add a dependency that overlaps with a row in this table without asking.
   data/
     docs/*.md              knowledge base: Bankmonitor articles summarised, with front matter
     golden-set.json        15 eval questions
-  drizzle/                 generated SQL migrations (enable_vector, init, ...)
-  drizzle.config.ts        migrations use DATABASE_URL_SESSION
   eval/results.json        latest eval run (committed, quoted by the README)
-  scripts/                 ingest.ts, eval.ts, *-check.ts (local only; load .env.local with dotenv)
+  scripts/                 setup-db.ts, ingest.ts, eval.ts, *-check.ts (local only; load .env.local with dotenv)
   tests/                   Vitest unit tests (*.test.ts)
   src/
     proxy.ts               Basic Auth for every route
@@ -73,8 +77,8 @@ Do not add a dependency that overlaps with a row in this table without asking.
       ui/                  shadcn primitives + empty-state (DESIGN_SYSTEM.md §06)
       chat/                filter-bar, chat-input, answer-view, source-card
     db/
-      client.ts            postgres.js client (prepare: false, max: 1) + drizzle
-      schema.ts            documents, chunks, indexes
+      client.ts            cached MongoClient (globalThis), getDb()
+      collections.ts       document types, collection accessors, index and search index definitions
     lib/
       env.ts               Zod-validated env, server-only
       embeddings.ts        embedTexts, embedQuery
@@ -85,12 +89,24 @@ Do not add a dependency that overlaps with a row in this table without asking.
       utils.ts             cn() for class names
 ```
 
+Data model (two collections in database `MONGODB_DB`):
+
+| Collection  | Fields                                                                                                                                                                                                       | Indexes                                                                       |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------- |
+| `documents` | `_id`, `slug`, `title`, `products[]`, `banks[]`, `sourceUrl`, `updatedAt` (YYYY-MM-DD), `contentHash`, `createdAt`                                                                                           | unique `slug`                                                                 |
+| `chunks`    | `_id`, `documentId`, `slug`, `ordinal`, `sectionPath`, `contextHeader`, `content`, `products[]`, `banks[]`, `bankGeneral` (true when `banks` is empty), `title`, `sourceUrl`, `updatedAt`, `embedding[1536]` | `documentId`; vector search index `chunks_vector`; search index `chunks_text` |
+
+Search indexes (M0 allows at most 3 Atlas Search + Vector Search indexes in total; we use 2):
+
+- `chunks_vector` (type `vectorSearch`): `embedding` (1536, cosine); filter fields `products`, `banks`, `bankGeneral`.
+- `chunks_text` (type `search`, `analyzer: lucene.hungarian`, static mapping): `contextHeader` and `content` as `string`; `products`, `banks` as `token`; `bankGeneral` as `boolean`.
+
 Where new code belongs:
 
 - A new page: `src/app/<route>/page.tsx`. Thin; UI only.
 - A new pipeline step: `src/lib/retrieval/` or `src/lib/generation/`, called from `pipeline.ts`.
 - A new third-party call: through the AI SDK in the module that owns the step. No direct `fetch` to OpenAI.
-- Database access: `src/db/` (schema, client) and the search functions in `src/lib/retrieval/search.ts`. Nothing else queries the database, except `scripts/ingest.ts` and `src/app/api/banks/route.ts`.
+- Database access: `src/db/` (client, collections) and the search functions in `src/lib/retrieval/search.ts`. Nothing else queries the database, except `scripts/` and `src/app/api/banks/route.ts`.
 - A new UI primitive: `src/components/ui/`, added to DESIGN_SYSTEM.md in the same commit.
 
 ## 04 Data flow
@@ -104,17 +120,22 @@ Chat request:
 5. The route writes each event as one NDJSON line and stops the generator when the client aborts.
 6. The UI buffers by line, shows `partial` text as unverified, and replaces it with the `final` result.
 
-Ingestion (local): `loadDocuments()` validates every file first (all-or-nothing) → per document, skip if `contentHash` matches, otherwise delete + reinsert in one transaction with fresh chunks and embeddings → delete documents whose file is gone.
+Filters, applied inside both search stages (pre-filter, never after):
+
+- Product (unless `osszes`): `products` in `[product, 'altalanos']`.
+- Bank (if given): `banks` equals the bank, or `bankGeneral` is true.
+
+Ingestion (local): `loadDocuments()` validates every file first (all-or-nothing) → per document, skip if `contentHash` matches, otherwise replace the document and its chunks in one transaction with fresh embeddings → delete documents (and chunks) whose file is gone → wait until both search indexes report the new data as queryable before the script says done.
 
 State:
 
-- Server state: `documents` and `chunks` only. No users, conversations or messages tables.
+- Server state: `documents` and `chunks` only. No users, conversations or messages collections.
 - Client state: messages, filters, loading flag (React state). Optimistic updates: none.
 
 Errors:
 
 - Validation errors return 400 with `{ error }`.
-- Pipeline exceptions are logged with `console.error` and become an `error` event with a generic Hungarian message. Never show stack traces or OpenAI error text.
+- Pipeline exceptions are logged with `console.error` and become an `error` event with a generic Hungarian message. Never show stack traces, OpenAI or MongoDB error text.
 - Rerank failure is an error, never "generate without the threshold".
 
 ## 05 Boundaries
@@ -143,21 +164,24 @@ The agent must not "fix" these.
 - The answer streams before it is validated. The UI marks it as unverified and replaces it with the final result. This is the accepted trade-off for responsiveness.
 - LLM rerank instead of a cross-encoder: no extra vendor, and the score is the refusal threshold. Results below `RERANK_THRESHOLD` are dropped even if that leaves nothing.
 - Output schemas have no Zod `min` / `max`: OpenAI strict structured output rejects some JSON Schema keywords. Range checks happen in code.
-- Full-text search builds an OR query (`to_tsquery('hungarian', 'a | b | c')`), not `websearch_to_tsquery`. AND semantics returns nothing for natural questions; RRF and rerank fix the ranking.
-- `set local hnsw.ef_search = 200` runs inside `db.transaction()`. Outside a transaction it has no effect on the transaction pooler.
-- `postgres(url, { prepare: false, max: 1 })`: the Supabase transaction pooler does not support prepared statements; one connection per serverless instance.
-- `contextHeader` is stored apart from `content`. Embeddings and `tsv` include the header; the citation validator checks quotes against `content` only.
+- Two separate queries plus RRF in TypeScript, not `$rankFusion`: the two run in parallel, and `$rankFusion` support on M0 is not documented.
+- Document fields (`title`, `slug`, `sourceUrl`, `updatedAt`, `products`, `banks`) are copied onto every chunk. Search results need them, and a `$lookup` after `$vectorSearch` / `$search` adds latency for no gain at this scale.
+- `bankGeneral` exists only because the vector search pre-filter cannot reliably express "the `banks` array is empty". Keep it in sync with `banks` at ingest.
+- Full-text uses the `text` operator over `contextHeader` and `content`, which matches any term (OR semantics). Do not switch to `phrase` or require all terms: natural questions would return nothing; RRF and rerank fix the ranking.
+- `numCandidates: 200` for `limit: 20` (the documented ≥ 20× guideline): filtered vector queries need the extra candidates.
+- One `MongoClient` cached on `globalThis`, small pool (`maxPoolSize: 5`): serverless functions and hot reload must not open a new pool per request.
+- `contextHeader` is stored apart from `content`. Embeddings and the text index include the header; the citation validator checks quotes against `content` only.
 - When the validator rejects good answers, tighten the prompt's quoting rule. Do not loosen the validator.
-- Conversation history lives in the client and is resent with each request. No conversation tables.
-- Ingest never runs on Vercel. The local script writes to the same Supabase database production reads.
+- Conversation history lives in the client and is resent with each request. No conversation collections.
+- Ingest never runs on Vercel. The local script writes to the same Atlas cluster production reads.
 - Basic Auth protects every route, including the API, even though it is "only a demo": the URL and repo are public and the OpenAI key is real.
 - File names are kebab-case (`source-card.tsx`), unlike the PascalCase names in the planning document.
 
 ## 07 Scalability and future considerations
 
-- Expected scale: one demo session, a handful of users, 12–15 documents, under 100 chunks. Build for this.
-- Known limits: one question takes 10–25 s (`maxDuration = 60`); the free Supabase project pauses after inactivity; no rate limiting beyond Basic Auth.
-- Planned next (production plan): NestJS backend, SSO and roles, versioned documents with validity dates, number validation, feedback, Langfuse, eval in CI, live rates via tool calling.
+- Expected scale: one demo session, a handful of users, 12–15 documents, under 100 chunks. Build for this; M0 limits (512 MB storage, 3 search indexes, shared resources) are far away.
+- Known limits: one question takes 10–25 s (`maxDuration = 60`); search indexes are eventually consistent (seconds after a write); M0 clusters pause after long inactivity; no rate limiting beyond Basic Auth.
+- Planned next (production plan): NestJS backend, SSO and roles, versioned documents with validity dates, number validation, feedback, Langfuse, eval in CI, live rates via tool calling. The production plan's database choice (Postgres) is open again after this change.
 - Not planned for the demo: multi-tenant, document upload, background jobs. Do not add abstractions for these.
 
 ## 08 When the agent must stop and ask
@@ -166,30 +190,32 @@ If a task needs any of the following, stop, name the conflict, and propose the s
 
 - Crossing a boundary in §05
 - Changing a decision in §06
-- Adding a table, column, index, dependency, or third-party service
+- Adding a collection, field, index, search index, dependency, or third-party service
 - Changing the auth, the relevance threshold logic, or the citation validator rules
-- Running a migration or the ingest against the shared Supabase database
+- Running `db:setup`, the ingest, or any write against the shared Atlas cluster
 
 ## 09 Environments and configuration
 
-| Environment | URL                                   | Deployed from | Data                                            |
-| ----------- | ------------------------------------- | ------------- | ----------------------------------------------- |
-| Local       | http://localhost:3000                 | your machine  | the Supabase project (no separate dev database) |
-| Preview     | per-PR Vercel URL                     | pull requests | the same Supabase project                       |
-| Production  | `DEMO_URL` (Vercel production domain) | `main`        | the same Supabase project                       |
+| Environment | URL                                   | Deployed from | Data                                     |
+| ----------- | ------------------------------------- | ------------- | ---------------------------------------- |
+| Local       | http://localhost:3000                 | your machine  | the Atlas M0 cluster (no local database) |
+| Preview     | per-PR Vercel URL                     | pull requests | the same cluster                         |
+| Production  | `DEMO_URL` (Vercel production domain) | `main`        | the same cluster                         |
+
+Atlas network access must allow Vercel's dynamic egress IPs (`0.0.0.0/0` on the free tier); the database user is the only gate, so it gets a long random password and the `readWrite` role on `MONGODB_DB` only.
 
 Environment variables (names only; values live in Vercel and `.env.local`):
 
-| Name                     | Used by                                                     | Server-only |
-| ------------------------ | ----------------------------------------------------------- | ----------- |
-| OPENAI_API_KEY           | `src/lib/env.ts` → AI SDK                                   | yes         |
-| DATABASE_URL             | `src/db/client.ts` (transaction pooler, port 6543)          | yes         |
-| DATABASE_URL_SESSION     | `drizzle.config.ts` (session pooler, port 5432); local only | yes         |
-| GENERATION_MODEL         | generation (default `gpt-5.5`)                              | yes         |
-| HELPER_MODEL             | rerank, rewrite (default `gpt-5.4-mini`)                    | yes         |
-| EMBEDDING_MODEL          | embeddings (default `text-embedding-3-small`)               | yes         |
-| RERANK_THRESHOLD         | rerank (default 6, 0–10)                                    | yes         |
-| DEMO_USER, DEMO_PASSWORD | `src/proxy.ts`                                              | yes         |
-| DEMO_URL                 | test commands and scripts; local only                       | no secret   |
+| Name                     | Used by                                                 | Server-only |
+| ------------------------ | ------------------------------------------------------- | ----------- |
+| OPENAI_API_KEY           | `src/lib/env.ts` → AI SDK                               | yes         |
+| MONGODB_URI              | `src/db/client.ts` (`mongodb+srv://` connection string) | yes         |
+| MONGODB_DB               | database name (default `kb_assistant`)                  | yes         |
+| GENERATION_MODEL         | generation (default `gpt-5.5`)                          | yes         |
+| HELPER_MODEL             | rerank, rewrite (default `gpt-5.4-mini`)                | yes         |
+| EMBEDDING_MODEL          | embeddings (default `text-embedding-3-small`)           | yes         |
+| RERANK_THRESHOLD         | rerank (default 6, 0–10)                                | yes         |
+| DEMO_USER, DEMO_PASSWORD | `src/proxy.ts`                                          | yes         |
+| DEMO_URL                 | test commands and scripts; local only                   | no secret   |
 
-Changing `EMBEDDING_MODEL` makes old embeddings incomparable: empty `documents` and `chunks` and rerun the ingest.
+Changing `EMBEDDING_MODEL` makes old embeddings incomparable: empty `documents` and `chunks`, rerun `db:setup` if the dimensions change, then rerun the ingest.
