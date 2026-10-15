@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 
-import { buildRetryPrompt, buildUserPrompt } from "@/lib/generation/prompt";
+import {
+  buildRetryPrompt,
+  buildUserPrompt,
+  describeFilters,
+} from "@/lib/generation/prompt";
 import type { RankedCandidate } from "@/lib/retrieval/types";
 
 const source = (n: number, banks: string[]): RankedCandidate => ({
@@ -55,5 +59,27 @@ describe("buildUserPrompt", () => {
     expect(prompt).toContain(
       "Javítsd, és csak a forrásokból szó szerint idézz.",
     );
+  });
+
+  it("puts the active filters before the question, and nothing when unfiltered", () => {
+    const sources = [source(1, ["MBH Bank"])];
+
+    const filtered = buildUserPrompt("Mekkora összeg?", sources, {
+      product: "szemelyi_kolcson",
+      bank: "MBH Bank",
+    });
+    const unfiltered = buildUserPrompt("Mekkora összeg?", sources, {
+      product: "osszes",
+      bank: null,
+    });
+
+    expect(filtered).toContain(
+      "</források>\n\nSzűrők: termék = személyi kölcsön; bank = MBH Bank\nKérdés: Mekkora összeg?",
+    );
+    expect(unfiltered).toContain("</források>\n\nKérdés: Mekkora összeg?");
+    expect(describeFilters({ product: "osszes", bank: "OTP Bank" })).toBe(
+      "Szűrők: bank = OTP Bank",
+    );
+    expect(describeFilters()).toBe("");
   });
 });

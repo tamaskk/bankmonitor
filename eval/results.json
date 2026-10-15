@@ -1,5 +1,5 @@
 {
-  "runAt": "2026-10-15T10:22:26.365Z",
+  "runAt": "2026-10-15T10:36:51.471Z",
   "models": {
     "generation": "gpt-5.5",
     "helper": "gpt-5.4-mini",
@@ -7,9 +7,10 @@
   },
   "rerankThreshold": 6,
   "items": 15,
+  "errors": 0,
   "metrics": {
     "recallAt5": 1,
-    "citationAccuracy": 0.75,
+    "citationAccuracy": 1,
     "correctRefusal": 1,
     "answerRate": 1
   },
@@ -26,15 +27,12 @@
       "reason": "",
       "ok": true,
       "recallHit": true,
-      "citations": 3,
+      "citations": 2,
       "correctCitations": 2,
-      "retrieved": [
-        "szemelyi-kolcson-alapok",
-        "szemelyi-kolcson-alapok",
-        "mbh-bank-szemelyi-kolcson"
-      ],
-      "seconds": 7.7,
-      "answer": "A személyi kölcsön futamideje általánosan legfeljebb 10 év (120 hónap), de a bankok gyakorlata eltér: van, ahol 84 hónap (7 év), máshol 96 hónap (8 év), néhány pénzintézetnél pedig 120 hónap (10 év) a leghosszabb futamidő. [1]\nA 2026. február 23-i állapot szerint a szabad célú személyi hitelek maximális futamideje bankonként eltér, például K&H Banknál 10 év, CIB Banknál, Erste Banknál, Magnet Banknál, MBH Banknál és UniCredit Banknál 8 év, OTP Banknál és Raiffeisen Banknál 7 év. [2]\nAz MBH Banknál a forrás szerint a maximum 7 évről 8 évre emelkedett a 2026. február 23-i állapot szerint. [3]"
+      "cited": ["szemelyi-kolcson-alapok", "szemelyi-kolcson-alapok"],
+      "retrieved": ["szemelyi-kolcson-alapok"],
+      "seconds": 6.2,
+      "answer": "A személyi kölcsön futamideje legfeljebb 10 év (120 hónap). [1] A bankok ebben nem egységesek: egyes bankoknál 84 hónap (7 év), másoknál 96 hónap (8 év), néhány pénzintézetnél pedig 120 hónap (10 év) a leghosszabb futamidő. [1]"
     },
     {
       "id": "gs-02",
@@ -44,31 +42,37 @@
       "reason": "",
       "ok": true,
       "recallHit": true,
-      "citations": 2,
-      "correctCitations": 2,
+      "citations": 1,
+      "correctCitations": 1,
+      "cited": ["szemelyi-kolcson-alapok"],
       "retrieved": ["szemelyi-kolcson-alapok", "mbh-bank-szemelyi-kolcson"],
-      "seconds": 6.3,
-      "answer": "A személyi kölcsön minimális hitelösszege bankonként és hitelcélonként eltér: a felvehető legkisebb hitelösszeg 0,3 és 2 millió forint között van a 2024. március 28-i cikk szerint. [1]\nAz MBH Banknál a személyi kölcsön összege 500 ezer forint és 15 millió forint között lehet, vagyis a minimális hitelösszeg ennél a banknál 500 ezer forint. [2]"
+      "seconds": 5.5,
+      "answer": "A személyi kölcsön minimális hitelösszege bankonként és hitelcélonként eltér: a felvehető legkisebb hitelösszeg 0,3 és 2 millió forint között van, az egyes bankok saját alsó határát a bank hirdetménye határozza meg. [1]"
     },
     {
       "id": "gs-03",
       "question": "Mennyi a maximális futamidő?",
       "answerable": true,
-      "status": "partial",
+      "status": "answered",
       "reason": "",
       "ok": true,
       "recallHit": true,
       "citations": 3,
-      "correctCitations": 1,
+      "correctCitations": 3,
+      "cited": [
+        "lakashitel-alapok",
+        "cib-bank-fix-kamatozasu-lakashitel",
+        "otthon-start"
+      ],
       "retrieved": [
         "lakashitel-alapok",
-        "otthon-start",
         "cib-bank-fix-kamatozasu-lakashitel",
         "cib-bank-fix-kamatozasu-lakashitel",
-        "cib-bank-fix-kamatozasu-lakashitel"
+        "cib-bank-fix-kamatozasu-lakashitel",
+        "otthon-start"
       ],
-      "seconds": 7.8,
-      "answer": "A lakáshitelek maximális futamideje általánosan akár 35 év is lehet. [1]\nAz Otthon Start támogatott lakáshitelnél a maximális futamidő 25 év. [2]\nA CIB Bank végig fix kamatozású lakáscélú jelzáloghitele a forrás szerint akár 30 éves futamidőre is igényelhető. [4]\nA kérdésből nem derül ki, melyik hiteltípusra vonatkozik, ezért a forrásokban szereplő eltérő maximális futamidőket lehet megadni. [1][2][4]"
+      "seconds": 5.7,
+      "answer": "Lakáshitelek esetén a maximális futamidő akár 35 év is lehet. [1]\nCIB Banknál a végig fix kamatozású lakáscélú jelzáloghitel akár 30 éves futamidőre is igényelhető. [3]\nAz Otthon Start támogatott lakáshitel maximális futamideje 25 év. [5]"
     },
     {
       "id": "gs-04",
@@ -80,9 +84,10 @@
       "recallHit": true,
       "citations": 2,
       "correctCitations": 2,
+      "cited": ["szemelyi-kolcson-alapok", "szemelyi-kolcson-alapok"],
       "retrieved": ["szemelyi-kolcson-alapok", "szemelyi-kolcson-alapok"],
-      "seconds": 6.4,
-      "answer": "A személyi kölcsön futamideje legfeljebb 10 év (120 hónap), de a bankok gyakorlata nem egységes: egyes bankoknál 84 hónap (7 év), másoknál 96 hónap (8 év), néhány pénzintézetnél pedig 120 hónap (10 év) a leghosszabb futamidő. [1]\nA 2026. február 23-i állapot szerint a szabad célú személyi hitelek maximális futamideje bankonként 7 év, 8 év vagy 10 év is lehet. [2]"
+      "seconds": 6.2,
+      "answer": "A személyi kölcsön futamideje legfeljebb 10 év (120 hónap). [1]\nA bankok között eltérés van: egyes bankoknál 84 hónap (7 év), másoknál 96 hónap (8 év), néhány pénzintézetnél pedig 120 hónap (10 év) a leghosszabb futamidő. [1]"
     },
     {
       "id": "gs-05",
@@ -92,16 +97,18 @@
       "reason": "",
       "ok": true,
       "recallHit": true,
-      "citations": 4,
-      "correctCitations": 0,
+      "citations": 1,
+      "correctCitations": 1,
+      "cited": ["mbh-bank-szemelyi-kolcson"],
       "retrieved": [
         "szemelyi-kolcson-alapok",
         "mbh-bank-szemelyi-kolcson",
         "szemelyi-kolcson-alapok",
+        "mbh-bank-szemelyi-kolcson",
         "mbh-bank-szemelyi-kolcson"
       ],
-      "seconds": 7.3,
-      "answer": "A személyi kölcsön hitelösszege a néhány százezer forintos nagyságrendtől a tízmillió forint feletti összegig terjedhet. [3]\n\nA 2024. március 28-i cikk szerint a személyi kölcsön maximális összege bankonként 8 és 15 millió forint között lehet. [1]\n\nA Bankmonitor 2025. december 22-i cikke szerint a 15 millió forintos felső határ általánossá vált, és a CIB Bank, az Erste Bank, a K&H Bank, az MBH Bank, az OTP Bank, a Raiffeisen Bank és a UniCredit Bank maximuma 15 millió forint. [1]\n\nA Cofidis és a Magnet Bank maximuma 10 millió forint, a Magnet Banknál zöld hitelcél esetén 12 millió forint. [1]"
+      "seconds": 5.4,
+      "answer": "Az MBH Banknál a személyi kölcsön összege 500 ezer forint és 15 millió forint között lehet. [2]"
     },
     {
       "id": "gs-06",
@@ -113,9 +120,14 @@
       "recallHit": true,
       "citations": 2,
       "correctCitations": 2,
-      "retrieved": ["otp-bank-bankszamla"],
-      "seconds": 6,
-      "answer": "A díjmentes számlavezetéshez a vizsgált 2 hónapból legalább az egyikben legalább 200 000 Ft-nak kell érkeznie a Bázis számlára vagy a hozzá kapcsolódó devizaszámlára, legfeljebb 2 jóváírásból. [1]\nA jóváírásnak munkabérből, nyugdíjból vagy külső, nem OTP-s számláról érkező utalásból kell származnia. [1]"
+      "cited": ["otp-bank-bankszamla", "otp-bank-bankszamla"],
+      "retrieved": [
+        "otp-bank-bankszamla",
+        "bankszamla-dijak",
+        "otp-bank-bankszamla"
+      ],
+      "seconds": 6.7,
+      "answer": "Az OTP Top számlacsomagnál a díjmentes számlavezetéshez a vizsgált 2 hónapból legalább az egyikben legalább 200 000 Ft jóváírásnak kell érkeznie a Bázis számlára vagy a hozzá kapcsolódó devizaszámlára, legfeljebb 2 jóváírásból. [1]\n\nFontos, hogy a jóváírásnak munkabérből, nyugdíjból vagy külső, nem OTP-s számláról érkező utalásból kell származnia. [1]"
     },
     {
       "id": "gs-07",
@@ -125,17 +137,18 @@
       "reason": "",
       "ok": true,
       "recallHit": true,
-      "citations": 4,
-      "correctCitations": 4,
+      "citations": 3,
+      "correctCitations": 3,
+      "cited": ["bankszamla-dijak", "bankszamla-dijak", "bankszamla-dijak"],
       "retrieved": [
-        "bankszamla-dijak",
         "bankszamla-dijak",
         "otp-bank-bankszamla",
         "bankszamla-dijak",
+        "bankszamla-dijak",
         "otp-bank-bankszamla"
       ],
-      "seconds": 6.7,
-      "answer": "Nem, nem igaz, hogy a számlavezetés mindig ingyenes. [1] A 0 Ft-os számlavezetési díj csak akkor jár, ha az ügyfél teljesíti a bank feltételeit, leggyakrabban havi meghatározott minimális összeg jóváírásával. [1] A Bankmonitor 2026. június 12-i összefoglalója szerint a bemutatott hat lakossági bankszámlánál a számlavezetési díj 0 Ft lehet, de egyik ajánlatnál sem feltétel nélküli. [2]"
+      "seconds": 6.3,
+      "answer": "Nem, nem igaz, hogy a számlavezetés mindig ingyenes. [1] A 0 Ft-os számlavezetési díj csak akkor jár, ha az ügyfél teljesíti a bank feltételeit, leggyakrabban azt, hogy havonta egy meghatározott minimális összeg érkezzen a számlára. [1] Az összefoglalóban szereplő hat számla mindegyikénél van havi jóváírási követelmény, amely 200 000 Ft-tól 450 000 Ft-ig terjed. [1]"
     },
     {
       "id": "gs-08",
@@ -145,16 +158,17 @@
       "reason": "",
       "ok": true,
       "recallHit": true,
-      "citations": 2,
-      "correctCitations": 2,
+      "citations": 1,
+      "correctCitations": 1,
+      "cited": ["ingyenes-keszpenzfelvetel"],
       "retrieved": [
         "ingyenes-keszpenzfelvetel",
-        "otp-bank-bankszamla",
         "ingyenes-keszpenzfelvetel",
-        "ingyenes-keszpenzfelvetel"
+        "ingyenes-keszpenzfelvetel",
+        "otp-bank-bankszamla"
       ],
-      "seconds": 5.8,
-      "answer": "A számlatulajdonos havonta két alkalommal, összesen legfeljebb 300 000 Ft készpénzt vehet fel díjmentesen bármelyik hazai bank bankjegykiadó automatájából. [1] Az alkalmak száma továbbra is havi két díjmentes felvétel. [1]"
+      "seconds": 4.6,
+      "answer": "Bankszámláról havonta két alkalommal, összesen legfeljebb 300 000 Ft készpénzt lehet díjmentesen felvenni. [1]"
     },
     {
       "id": "gs-09",
@@ -166,9 +180,10 @@
       "recallHit": true,
       "citations": 2,
       "correctCitations": 2,
+      "cited": ["otthon-start", "otthon-start"],
       "retrieved": ["otthon-start", "otthon-start"],
-      "seconds": 5.6,
-      "answer": "Az Otthon Start hitel kamata végig fix 3% a teljes futamidő alatt. [2]\nA forrás szerint a bankok egy része a jogszabályi 3%-os kamatplafon alatt kínálja a hitelt, és évi 2,75%-os kamat is előfordul. [2]"
+      "seconds": 5.5,
+      "answer": "Az Otthon Start hitel kamata végig fix 3% a teljes futamidő alatt. [2]\nA forrás szerint a bankok egy része a jogszabályi 3%-os kamatplafon alatt is kínálja a hitelt, és évi 2,75%-os kamat is előfordul. [2]"
     },
     {
       "id": "gs-10",
@@ -180,8 +195,9 @@
       "recallHit": true,
       "citations": 1,
       "correctCitations": 1,
+      "cited": ["thm-jelentese"],
       "retrieved": ["thm-jelentese"],
-      "seconds": 4.4,
+      "seconds": 5.4,
       "answer": "Nem, a közjegyzői díj nem szerepel a THM-ben. [1]"
     },
     {
@@ -194,8 +210,9 @@
       "recallHit": true,
       "citations": 3,
       "correctCitations": 3,
+      "cited": ["hitelkozvetites", "hitelkozvetites", "hitelkozvetites"],
       "retrieved": ["hitelkozvetites", "hitelkozvetites", "hitelkozvetites"],
-      "seconds": 5.5,
+      "seconds": 5.2,
       "answer": "A Bankmonitor hitelszakértőinek szolgáltatása az ügyfél számára ingyenes, illetve díjmentes. [1][2][3]"
     },
     {
@@ -208,6 +225,7 @@
       "recallHit": null,
       "citations": 0,
       "correctCitations": 0,
+      "cited": [],
       "retrieved": [],
       "seconds": 2.1,
       "answer": "Erre a kérdésre nem találtam megbízható forrást a tudásbázisban. Ellenőrizd a kérdést vagy a szűrőket."
@@ -222,8 +240,9 @@
       "recallHit": null,
       "citations": 0,
       "correctCitations": 0,
+      "cited": [],
       "retrieved": [],
-      "seconds": 4.9,
+      "seconds": 2.8,
       "answer": "Erre a kérdésre nem találtam megbízható forrást a tudásbázisban. Ellenőrizd a kérdést vagy a szűrőket."
     },
     {
@@ -236,8 +255,9 @@
       "recallHit": null,
       "citations": 0,
       "correctCitations": 0,
+      "cited": [],
       "retrieved": [],
-      "seconds": 3.3,
+      "seconds": 2.5,
       "answer": "Erre a kérdésre nem találtam megbízható forrást a tudásbázisban. Ellenőrizd a kérdést vagy a szűrőket."
     },
     {
@@ -250,8 +270,9 @@
       "recallHit": null,
       "citations": 0,
       "correctCitations": 0,
+      "cited": [],
       "retrieved": [],
-      "seconds": 2.8,
+      "seconds": 2.5,
       "answer": "Erre a kérdésre nem találtam megbízható forrást a tudásbázisban. Ellenőrizd a kérdést vagy a szűrőket."
     }
   ]
