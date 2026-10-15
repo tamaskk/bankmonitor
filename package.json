@@ -18,7 +18,8 @@
     "db:check": "tsx --conditions=react-server scripts/db-check.ts",
     "search:check": "tsx --conditions=react-server scripts/search-check.ts",
     "rerank:check": "tsx --conditions=react-server scripts/rerank-check.ts",
-    "rewrite:check": "tsx --conditions=react-server scripts/rewrite-check.ts"
+    "rewrite:check": "tsx --conditions=react-server scripts/rewrite-check.ts",
+    "generate:check": "tsx --conditions=react-server scripts/generate-check.ts"
   },
   "dependencies": {
     "@ai-sdk/openai": "^4.0.94",
