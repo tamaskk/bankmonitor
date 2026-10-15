@@ -36,7 +36,7 @@ export function productLabel(product: string): string {
 
 /**
  * The context sent with a follow-up: user questions and verified answers
- * only. A refusal or an error carries no facts, and the streamed text was
+ * only. A refusal, a fixed help reply or an error carries no facts, and the streamed text was
  * never verified, so neither goes back to the model.
  */
 export function buildHistory(messages: UiMessage[]): ChatTurn[] {
@@ -45,7 +45,12 @@ export function buildHistory(messages: UiMessage[]): ChatTurn[] {
       return [{ role: "user", content: message.content }];
     }
     const { result } = message;
-    if (message.phase !== "done" || !result || result.status === "not_found") {
+    if (
+      message.phase !== "done" ||
+      !result ||
+      result.status === "not_found" ||
+      result.status === "info"
+    ) {
       return [];
     }
     return [{ role: "assistant", content: result.answer }];

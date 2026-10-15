@@ -17,10 +17,15 @@ const citedSourceSchema = z.object({
 });
 
 const finalResultSchema = z.object({
-  status: z.enum(["answered", "partial", "not_found"]),
+  status: z.enum(["answered", "partial", "not_found", "info"]),
   answer: z.string(),
   reason: z
-    .enum(["no_relevant_source", "validation_failed", "model_not_found"])
+    .enum([
+      "no_relevant_source",
+      "validation_failed",
+      "model_not_found",
+      "off_topic",
+    ])
     .optional(),
   citations: z.array(
     z.object({ n: z.number(), quote: z.string(), source: citedSourceSchema }),

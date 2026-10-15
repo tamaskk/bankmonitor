@@ -13,6 +13,7 @@ const REASON_TEXT: Record<NonNullable<FinalResult["reason"]>, string> = {
   no_relevant_source: "Nincs elég releváns forrás a tudásbázisban",
   validation_failed: "A válasz nem ment át a forrásellenőrzésen",
   model_not_found: "A források nem tartalmazzák a választ",
+  off_topic: "Nem a tudásbázis témájához tartozik",
 };
 
 type SourceGroup = { n: number; source: CitedSource; quotes: string[] };
@@ -91,10 +92,29 @@ export function AnswerView({ message }: { message: UiMessage }) {
         <p role="alert" className="text-destructive text-sm">
           {message.content}
         </p>
+      ) : result?.status === "info" ? (
+        // A fixed reply about the assistant: no sources, so no verified badge.
+        <div
+          role="status"
+          className="bg-muted flex max-w-prose flex-col gap-2 rounded-lg p-4"
+        >
+          <Badge variant="secondary" className="text-muted-foreground w-fit">
+            Tájékoztatás
+          </Badge>
+          <p className="text-sm leading-relaxed wrap-break-word whitespace-pre-wrap">
+            {result.answer}
+          </p>
+        </div>
       ) : result?.status === "not_found" ? (
         <div
           role="status"
-          className="border-destructive flex max-w-prose flex-col gap-1 rounded-lg border p-4"
+          className={cn(
+            "flex max-w-prose flex-col gap-1 rounded-lg border p-4",
+            // Off-topic is not a failure of the knowledge base: no red frame.
+            result.reason === "off_topic"
+              ? "border-border bg-muted"
+              : "border-destructive",
+          )}
         >
           <p className="text-sm leading-relaxed wrap-break-word">
             {result.answer}

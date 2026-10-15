@@ -3,6 +3,11 @@ import "server-only";
 import { generateText, streamText } from "ai";
 
 import { embedQuery } from "@/lib/embeddings";
+import {
+  assistantReply,
+  OFF_TOPIC_MESSAGE,
+} from "@/lib/generation/assistant-help";
+import { classifyIntent } from "@/lib/generation/intent";
 import { generationOptions } from "@/lib/generation/model";
 import { buildRetryPrompt, buildUserPrompt } from "@/lib/generation/prompt";
 import {
@@ -38,9 +43,14 @@ export type CitedSource = Pick<
 >;
 
 export type FinalResult = {
-  status: "answered" | "partial" | "not_found";
+  // "info": a fixed reply about the assistant or to small talk, with no sources.
+  status: "answered" | "partial" | "not_found" | "info";
   answer: string;
-  reason?: "no_relevant_source" | "validation_failed" | "model_not_found";
+  reason?:
+    | "no_relevant_source"
+    | "validation_failed"
+    | "model_not_found"
+    | "off_topic";
   citations: { n: number; quote: string; source: CitedSource }[];
   retrieved: { slug: string; score: number }[];
 };
@@ -84,9 +94,23 @@ export async function* answerQuestion(
 
     // 3. Nothing relevant: refuse without calling the generation model.
     if (sources.length === 0) {
+      // "Mit tudok tőled kérdezni?", "Szia", "Köszönöm" find no source but
+      // deserve a reply. Classified only here, so answerable questions pay
+      // no extra latency; the reply is fixed text, never generated.
+      // Questions outside banking altogether get "not related" instead of
+      // "no source"; both are refusals (not_found), only the reason differs.
+      const intent = await classifyIntent(input.question, signal);
+      const reply = assistantReply(intent);
       yield {
         type: "final",
-        result: notFound("no_relevant_source", retrieved),
+        result: reply
+          ? { status: "info", answer: reply, citations: [], retrieved }
+          : intent === "off_topic"
+            ? {
+                ...notFound("off_topic", retrieved),
+                answer: OFF_TOPIC_MESSAGE,
+              }
+            : notFound("no_relevant_source", retrieved),
       };
       return;
     }
