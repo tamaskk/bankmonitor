@@ -8,6 +8,10 @@ import { GENERAL_BANK, PRODUCTS } from "@/db/types";
 import type { Filters } from "@/lib/retrieval/types";
 
 export const MAX_QUESTION_CHARS = 1000;
+// Follow-up context the chat accepts: enough for a short conversation,
+// small enough that one request cannot trigger an expensive rewrite.
+export const MAX_HISTORY_TURNS = 6;
+export const MAX_HISTORY_CHARS = 2000;
 export const MAX_QUERY_TOKENS = 64;
 const MIN_TOKEN_CHARS = 2;
 const MAX_TOKEN_CHARS = 50;
