@@ -1,0 +1,6 @@
+.next
+node_modules
+package-lock.json
+drizzle
+docs/planning
+HARNESS_BOOTSTRAP.md
