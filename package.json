@@ -14,7 +14,7 @@
     "test:watch": "vitest",
     "ingest": "tsx scripts/ingest.ts",
     "eval": "tsx scripts/eval.ts",
-    "db:setup": "tsx scripts/setup-db.ts"
+    "db:indexes": "tsx scripts/create-indexes.ts"
   },
   "dependencies": {
     "@ai-sdk/openai": "^4.0.94",

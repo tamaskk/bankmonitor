@@ -5,7 +5,7 @@ Derived from docs/PRD.md §05 and docs/planning/demo-gap-analysis.hu.md (task nu
 ## Now
 
 - [ ] T-002 (F1) Atlas M0 cluster in AWS Frankfurt, database user (readWrite on `kb_assistant`), network access for Vercel, `src/db/client.ts`, `scripts/db-check.ts` pings the cluster
-- [ ] T-003 (F1) `src/db/collections.ts` and idempotent `npm run db:setup`: unique `slug`, `documentId` index, `chunks_vector` (1536, cosine, filters `products`, `banks`, `bankGeneral`) and `chunks_text` (`lucene.hungarian`) search indexes
+- [ ] T-003 (F1) `src/db/collections.ts` and idempotent `npm run db:indexes`: unique `slug`, `documentId` index, `chunks_vector` (1536, cosine, filters `products`, `banks`, `bankGeneral`) and `chunks_text` (`lucene.hungarian`) search indexes
 
 ## Next
 
