@@ -1,19 +1,18 @@
 // T-005: section-based chunking with a context header. Pure module: no env,
 // no database, so the unit tests run without .env.local (ARCHITECTURE.md §05).
 
+import type { LoadedDocument } from "@/lib/ingest/load";
+
 export const MAX_CHUNK_CHARS = 2400; // ~800 tokens of Hungarian text
 export const MAX_OVERLAP_CHARS = 400;
 export const MIN_SECTION_CHARS = 150;
 export const INTRO_SECTION = "Bevezető";
 
-// Structural subset of the loader's LoadedDocument (T-004), so this module
-// does not depend on the loader.
-export type ChunkableDocument = {
-  title: string;
-  products: readonly string[];
-  banks: readonly string[];
-  body: string;
-};
+// Only the fields chunking needs; a type-only import keeps this module pure.
+export type ChunkableDocument = Pick<
+  LoadedDocument,
+  "title" | "products" | "banks" | "body"
+>;
 
 export type ChunkDraft = {
   ordinal: number;

@@ -32,18 +32,18 @@ npm run dev                  # http://localhost:3000
 
 ## Scripts
 
-| Script                                    | What it does                                                          |
-| ----------------------------------------- | --------------------------------------------------------------------- |
-| `npm run dev`                             | Development server                                                    |
-| `npm run build` / `npm run start`         | Production build / server                                             |
-| `npm run lint`                            | ESLint                                                                |
-| `npm run typecheck`                       | `next typegen` + `tsc --noEmit`                                       |
-| `npm run test` / `npm run test:watch`     | Vitest unit tests                                                     |
-| `npm run format` / `npm run format:check` | Prettier                                                              |
-| `npm run db:check`                        | Ping the Atlas cluster and print the server version                   |
-| `npm run db:indexes`                      | Create collections, indexes and Atlas search indexes (planned, T-003) |
-| `npm run ingest`                          | Load `data/docs` into the database (planned, T-006)                   |
-| `npm run eval`                            | Run the golden set and print accuracy metrics (planned, T-020)        |
+| Script                                    | What it does                                                                |
+| ----------------------------------------- | --------------------------------------------------------------------------- |
+| `npm run dev`                             | Development server                                                          |
+| `npm run build` / `npm run start`         | Production build / server                                                   |
+| `npm run lint`                            | ESLint                                                                      |
+| `npm run typecheck`                       | `next typegen` + `tsc --noEmit`                                             |
+| `npm run test` / `npm run test:watch`     | Vitest unit tests                                                           |
+| `npm run format` / `npm run format:check` | Prettier                                                                    |
+| `npm run db:check`                        | Ping the Atlas cluster and print the server version                         |
+| `npm run db:indexes`                      | Create collections, indexes and Atlas search indexes (planned, T-003)       |
+| `npm run ingest`                          | Load `data/docs` into Atlas (idempotent; `-- --force` re-embeds everything) |
+| `npm run eval`                            | Run the golden set and print accuracy metrics (planned, T-020)              |
 
 ## Knowledge base
 

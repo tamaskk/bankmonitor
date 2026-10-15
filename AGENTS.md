@@ -74,7 +74,7 @@ npm run test          unit tests (Vitest)
 npm run format        format the codebase (Prettier)
 npm run db:check        ping Atlas with the configured user (read-only)
 npm run db:indexes      create collections and Atlas search indexes (ask before running)
-npm run ingest        load data/docs into the database (planned; ask before running)
+npm run ingest        load data/docs into Atlas, idempotent; `-- --force` re-embeds all (ask before running)
 npm run eval          run the golden set (planned; costs OpenAI calls)
 ```
 

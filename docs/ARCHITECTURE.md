@@ -81,7 +81,8 @@ Do not add a dependency that overlaps with a row in this table without asking.
       types.ts             collection names, DocumentRecord, ChunkRecord, search index definitions
     lib/
       env.ts               Zod-validated env, server-only
-      embeddings.ts        embedTexts, embedQuery
+      embeddings.ts        embedTexts, embedQuery, chunkEmbeddingInput (header + content)
+      openai.ts            the one OpenAI provider, bound to env.OPENAI_API_KEY
       pipeline.ts          answerQuestion(): the only orchestrator
       ingest/              load.ts (front matter), chunk.ts (pure)
       retrieval/           types.ts, search.ts, rrf.ts (pure), rerank.ts, rewrite.ts
