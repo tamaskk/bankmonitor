@@ -63,7 +63,7 @@ Do not add a dependency that overlaps with a row in this table without asking.
     docs/*.md              knowledge base: Bankmonitor articles summarised, with front matter
     golden-set.json        15 eval questions
   eval/results.json        latest eval run (committed, quoted by the README)
-  scripts/                 load-env.ts (import first), db-check.ts, create-indexes.ts, ingest.ts, search-check.ts, eval.ts (local only; run via npm scripts with --conditions=react-server)
+  scripts/                 load-env.ts (import first), db-check.ts, create-indexes.ts, ingest.ts, search-check.ts, rerank-check.ts, rewrite-check.ts, generate-check.ts, pipeline-check.ts, eval.ts (local only; run via npm scripts with --conditions=react-server)
   tests/                   Vitest unit tests (*.test.ts)
   src/
     proxy.ts               Basic Auth for every route
@@ -86,7 +86,7 @@ Do not add a dependency that overlaps with a row in this table without asking.
       pipeline.ts          answerQuestion(): the only orchestrator
       ingest/              load.ts (front matter), chunk.ts (pure)
       retrieval/           types.ts, query.ts (pure: filter schema, word tokens), search.ts, rrf.ts (pure), rerank.ts, rewrite.ts
-      generation/          schema.ts, prompt.ts, validate.ts (pure)
+      generation/          schema.ts, prompt.ts, validate.ts (pure), model.ts (shared generation options)
       utils.ts             cn() for class names
 ```
 
