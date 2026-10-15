@@ -20,12 +20,11 @@ function safeEqual(a: string, b: string): boolean {
 function parseBasicAuth(
   header: string | null,
 ): { user: string; password: string } | null {
-  if (!header?.startsWith("Basic ")) return null;
+  // The scheme name is case-insensitive (RFC 7617).
+  const match = /^basic\s+(\S+)\s*$/i.exec(header ?? "");
+  if (!match) return null;
   // UTF-8 rather than atob(): atob() mangles non-ASCII passwords.
-  const decoded = Buffer.from(
-    header.slice("Basic ".length).trim(),
-    "base64",
-  ).toString("utf8");
+  const decoded = Buffer.from(match[1], "base64").toString("utf8");
   const separator = decoded.indexOf(":"); // first colon: the password may contain more
   if (separator === -1) return null;
   return {
@@ -37,7 +36,8 @@ function parseBasicAuth(
 export function proxy(request: NextRequest) {
   const expectedUser = process.env.DEMO_USER;
   const expectedPassword = process.env.DEMO_PASSWORD;
-  if (!expectedUser || !expectedPassword) {
+  // Whitespace-only values count as missing: env.ts is not consulted here.
+  if (!expectedUser?.trim() || !expectedPassword?.trim()) {
     // Fail closed: a deployment without credentials must not be open.
     return new NextResponse("Hiányzó szerverkonfiguráció", { status: 500 });
   }
@@ -59,5 +59,6 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
+  // Exact exclusions only: a bare prefix would also skip e.g. /favicon.icoX.
+  matcher: ["/((?!_next/static/|_next/image$|favicon\\.ico$).*)"],
 };
