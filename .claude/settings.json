@@ -26,25 +26,6 @@
       "Bash(gh run list *)",
       "Bash(gh run view *)"
     ],
-    "ask": [
-      "Bash(git push *)",
-      "Bash(gh pr create *)",
-      "Bash(gh pr merge *)",
-      "Bash(npm install *)",
-      "Bash(npm uninstall *)",
-      "Bash(npm update *)",
-      "Bash(vercel *)",
-      "Bash(npm run db:generate *)",
-      "Bash(npm run db:migrate *)",
-      "Bash(npx drizzle-kit *)",
-      "Bash(npm run ingest *)",
-      "Bash(npm run eval *)",
-      "Bash(npx shadcn@latest *)",
-      "Edit(package.json)",
-      "Edit(.claude/settings.json)",
-      "Edit(.claude/hooks/**)",
-      "Edit(.mcp.json)"
-    ],
     "deny": [
       "Read(.env)",
       "Read(.env.*)",
@@ -55,6 +36,29 @@
       "Bash(git push --force *)",
       "Bash(git push -f *)",
       "Bash(npm publish *)"
+    ],
+    "ask": [
+      "Bash(git push *)",
+      "Bash(gh pr create *)",
+      "Bash(gh pr merge *)",
+      "Bash(npm install *)",
+      "Bash(npm uninstall *)",
+      "Bash(npm update *)",
+      "Bash(vercel *)",
+      "Bash(npm run db:generate)",
+      "Bash(npm run db:generate *)",
+      "Bash(npm run db:migrate)",
+      "Bash(npm run db:migrate *)",
+      "Bash(npx drizzle-kit *)",
+      "Bash(npm run ingest)",
+      "Bash(npm run ingest *)",
+      "Bash(npm run eval)",
+      "Bash(npm run eval *)",
+      "Bash(npx shadcn@latest *)",
+      "Edit(package.json)",
+      "Edit(.claude/settings.json)",
+      "Edit(.claude/hooks/**)",
+      "Edit(.mcp.json)"
     ]
   },
   "hooks": {
@@ -93,5 +97,8 @@
         ]
       }
     ]
+  },
+  "enabledPlugins": {
+    "typescript-lsp@claude-plugins-official": true
   }
 }
