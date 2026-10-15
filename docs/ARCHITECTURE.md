@@ -75,7 +75,7 @@ Do not add a dependency that overlaps with a row in this table without asking.
       api/health/route.ts  GET, { status: "ok" }
     components/
       ui/                  shadcn primitives + empty-state (DESIGN_SYSTEM.md §06)
-      chat/                filter-bar, chat-input, answer-view, source-card
+      chat/                chat (client entry), use-chat (state, NDJSON fetch), filter-bar, chat-input, answer-view, source-card; pure helpers: chat-state, ndjson, answer-text
     db/
       client.ts            cached MongoClient promise on globalThis (failed connects not cached), getClient(), getDb()
       types.ts             collection names, PRODUCTS, DocumentRecord, ChunkRecord, search index definitions
