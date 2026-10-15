@@ -10,19 +10,21 @@ import {
   assistantReply,
   GREETING_MESSAGE,
   HELP_MESSAGE,
+  OFF_TOPIC_MESSAGE,
   THANKS_MESSAGE,
 } from "@/lib/generation/assistant-help";
 
 describe("assistantReply", () => {
-  it("returns the fixed text for help, greeting and thanks, and nothing for a real question", () => {
-    const replies = (["help", "greeting", "thanks", "question"] as const).map(
-      assistantReply,
-    );
+  it("returns the fixed text for help, greeting and thanks, and nothing for off-topic or real questions", () => {
+    const replies = (
+      ["help", "greeting", "thanks", "off_topic", "question"] as const
+    ).map(assistantReply);
 
     expect(replies).toEqual([
       HELP_MESSAGE,
       GREETING_MESSAGE,
       THANKS_MESSAGE,
+      null,
       null,
     ]);
   });
@@ -91,5 +93,22 @@ describe("the info status in the UI", () => {
     expect(history).toEqual([
       { role: "user", content: "Mit tudok tőled kérdezni?" },
     ]);
+  });
+
+  it("parses an off-topic refusal", () => {
+    const line = JSON.stringify({
+      type: "final",
+      result: {
+        status: "not_found",
+        reason: "off_topic",
+        answer: OFF_TOPIC_MESSAGE,
+        citations: [],
+        retrieved: [],
+      },
+    });
+
+    const event = parseEvent(line);
+
+    expect(event?.type === "final" && event.result.reason).toBe("off_topic");
   });
 });
