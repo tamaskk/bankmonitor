@@ -38,7 +38,7 @@ Maintainer notes (block comments are stripped from Claude's context):
 - Plan first (plan mode or a written plan) when a task touches more than 5 files or anything in docs/ARCHITECTURE.md §08.
 - Track multi-step work in the task list, one item in progress at a time.
 - Verify before saying done: `npm run typecheck` and the relevant tests. Say what you ran.
-- Never run `npm run db:setup`, `npm run ingest`, `npm run eval` or any write against Atlas without asking: there is one shared cluster, and eval costs OpenAI calls.
+- Never run `npm run db:indexes`, `npm run ingest`, `npm run eval` or any write against Atlas without asking: there is one shared cluster, and eval costs OpenAI calls.
 - Hooks in .claude/hooks enforce safety. If one blocks you, do not work around it: say what you wanted to run and why.
 - Only change .claude/**, .mcp.json or CLAUDE.md when the task is about the harness itself.
 - A convention I correct twice belongs in AGENTS.md or .claude/rules, not only in auto memory: propose the edit.
@@ -48,6 +48,6 @@ Maintainer notes (block comments are stripped from Claude's context):
 - `npm run typecheck` runs `next typegen` first; plain `tsc` fails on the global `LayoutProps` / `PageProps` types in a clean checkout.
 - `cacheComponents` is on (Next.js 16.4 default): no `export const dynamic`; use `await connection()` for request-time data.
 - `next dev` re-adds the Next.js block at the end of AGENTS.md. Keep it; do not delete it.
-- Scripts under `scripts/` must load `.env.local` themselves (`dotenv`); `tsx` does not.
-- Atlas search indexes are eventually consistent: right after `db:setup` or an ingest, `$vectorSearch` / `$search` can return stale or empty results for a few seconds. Poll the index status instead of debugging the query.
+- Scripts under `scripts/`: the first import is `import "./load-env";` (ES imports run in order, so `.env.local` loads before `@/lib/env` validates), and they run with `tsx --conditions=react-server` (via the npm scripts) because `env.ts` and `db/client.ts` import `server-only`, which throws in plain Node.
+- Atlas search indexes are eventually consistent: right after `db:indexes` or an ingest, `$vectorSearch` / `$search` can return stale or empty results for a few seconds. Poll the index status instead of debugging the query.
 - The validate-bash hook blocks reading or sourcing `.env*`, so the plan's `set -a; source .env.local` test commands are mine to run. In scripts use `node --env-file=.env.local …` or dotenv. The hook also matches such text inside a Bash command (e.g. writing it with `printf`); edit files with Edit/Write instead.

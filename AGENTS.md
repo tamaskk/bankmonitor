@@ -72,7 +72,8 @@ npm run lint          lint
 npm run typecheck     next typegen + tsc --noEmit
 npm run test          unit tests (Vitest)
 npm run format        format the codebase (Prettier)
-npm run db:setup      create collections and Atlas search indexes (ask before running)
+npm run db:check        ping Atlas with the configured user (read-only)
+npm run db:indexes      create collections and Atlas search indexes (ask before running)
 npm run ingest        load data/docs into the database (planned; ask before running)
 npm run eval          run the golden set (planned; costs OpenAI calls)
 ```
@@ -97,7 +98,7 @@ Stop and ask instead of guessing when:
 - The task conflicts with the PRD, the design system, or an architectural boundary.
 - Two reasonable readings of the task lead to different work.
 - The change needs a new dependency, table, secret, or service.
-- A command would write to the shared Atlas cluster (db:setup, ingest, manual writes).
+- A command would write to the shared Atlas cluster (db:indexes, ingest, manual writes).
 - Something is broken that the task did not mention.
 
 Ask with the specific question, the options you see, and your recommendation.
