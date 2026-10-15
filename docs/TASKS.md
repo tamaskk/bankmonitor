@@ -7,7 +7,7 @@ Derived from docs/PRD.md §05 and docs/planning/demo-gap-analysis.hu.md (task nu
 ## Next
 
 - [x] T-004 (F1) Markdown loader with Zod front matter validation, all-or-nothing (`src/lib/ingest/load.ts`)
-- [ ] T-005 (F1) Section-based chunking with context header, tables never split (`src/lib/ingest/chunk.ts`)
+- [x] T-005 (F1) Section-based chunking with context header, tables never split (`src/lib/ingest/chunk.ts`)
 - [ ] T-006 (F1) Embeddings and idempotent `npm run ingest` (`src/lib/embeddings.ts`, `scripts/ingest.ts`)
 - [ ] T-007 (F3) Hybrid search with product and bank pre-filters (`src/lib/retrieval/search.ts`)
 - [ ] T-008 (F2) RRF merge (`src/lib/retrieval/rrf.ts`)
