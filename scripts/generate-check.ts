@@ -32,7 +32,7 @@ async function main() {
     return;
   }
 
-  const prompt = buildUserPrompt(question, sources);
+  const prompt = buildUserPrompt(question, sources, filters);
   console.log(
     prompt
       .split("\n")
