@@ -40,7 +40,7 @@ npm run dev                  # http://localhost:3000
 | `npm run typecheck`                       | `next typegen` + `tsc --noEmit`                                       |
 | `npm run test` / `npm run test:watch`     | Vitest unit tests                                                     |
 | `npm run format` / `npm run format:check` | Prettier                                                              |
-| `npm run db:setup`                        | Create collections, indexes and Atlas search indexes (planned, T-003) |
+| `npm run db:indexes`                      | Create collections, indexes and Atlas search indexes (planned, T-003) |
 | `npm run ingest`                          | Load `data/docs` into the database (planned, T-006)                   |
 | `npm run eval`                            | Run the golden set and print accuracy metrics (planned, T-020)        |
 

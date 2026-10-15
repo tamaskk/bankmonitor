@@ -1,7 +1,7 @@
 ---
 paths:
   - "src/db/**"
-  - "scripts/setup-db.ts"
+  - "scripts/create-indexes.ts"
   - "scripts/ingest.ts"
   - "scripts/*-check.ts"
   - "src/lib/retrieval/search.ts"
@@ -11,7 +11,7 @@ paths:
 # Database (MongoDB Atlas M0 + official driver)
 
 - Schema changes (new collection, field, index or search index definition) need approval: docs/ARCHITECTURE.md §08. There is one shared Atlas cluster for local, preview and production, and M0 allows at most 3 search indexes (we use 2).
-- Collections, indexes and search indexes are created only by `scripts/setup-db.ts`, idempotently (create if missing, update the definition if it changed). Ask before running `npm run db:setup`, `npm run ingest`, or any write.
+- Collections, indexes and search indexes are created only by `scripts/create-indexes.ts`, idempotently (create if missing, update the definition if it changed). Ask before running `npm run db:indexes`, `npm run ingest`, or any write.
 - One `MongoClient` cached on `globalThis` in `src/db/client.ts` (`maxPoolSize: 5`); never connect inside a request handler.
 - Only `src/db/`, `src/lib/retrieval/search.ts`, `/api/banks` and `scripts/` touch the database.
 - NoSQL injection: never pass request objects or unvalidated values into a filter or pipeline. Values come from Zod-parsed strings and enums; reject anything that starts with `$`. The `$search` query string is built from extracted word tokens.

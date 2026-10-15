@@ -20,7 +20,7 @@ Next.js app on Vercel (fra1)
            Atlas Vector Search + Atlas Search (lucene.hungarian)
 
 Local machine only:
-    scripts/setup-db.ts  collections, indexes, search indexes (idempotent)
+    scripts/create-indexes.ts  collections, indexes, search indexes (idempotent)
     scripts/ingest.ts    data/docs/*.md --> chunks + embeddings --> Atlas
     scripts/eval.ts      data/golden-set.json --> pipeline --> eval/results.json
 ```
@@ -63,7 +63,7 @@ Do not add a dependency that overlaps with a row in this table without asking.
     docs/*.md              knowledge base: Bankmonitor articles summarised, with front matter
     golden-set.json        15 eval questions
   eval/results.json        latest eval run (committed, quoted by the README)
-  scripts/                 setup-db.ts, ingest.ts, eval.ts, *-check.ts (local only; load .env.local with dotenv)
+  scripts/                 create-indexes.ts, ingest.ts, eval.ts, *-check.ts (local only; load .env.local with dotenv)
   tests/                   Vitest unit tests (*.test.ts)
   src/
     proxy.ts               Basic Auth for every route
@@ -192,7 +192,7 @@ If a task needs any of the following, stop, name the conflict, and propose the s
 - Changing a decision in §06
 - Adding a collection, field, index, search index, dependency, or third-party service
 - Changing the auth, the relevance threshold logic, or the citation validator rules
-- Running `db:setup`, the ingest, or any write against the shared Atlas cluster
+- Running `db:indexes`, the ingest, or any write against the shared Atlas cluster
 
 ## 09 Environments and configuration
 
@@ -218,4 +218,4 @@ Environment variables (names only; values live in Vercel and `.env.local`):
 | DEMO_USER, DEMO_PASSWORD | `src/proxy.ts`                                          | yes         |
 | DEMO_URL                 | test commands and scripts; local only                   | no secret   |
 
-Changing `EMBEDDING_MODEL` makes old embeddings incomparable: empty `documents` and `chunks`, rerun `db:setup` if the dimensions change, then rerun the ingest.
+Changing `EMBEDDING_MODEL` makes old embeddings incomparable: empty `documents` and `chunks`, rerun `db:indexes` if the dimensions change, then rerun the ingest.
