@@ -43,7 +43,7 @@ npm run dev                  # http://localhost:3000
 | `npm run db:check`                        | Ping the Atlas cluster and print the server version                         |
 | `npm run db:indexes`                      | Create collections, indexes and Atlas search indexes (planned, T-003)       |
 | `npm run ingest`                          | Load `data/docs` into Atlas (idempotent; `-- --force` re-embeds everything) |
-| `npm run eval`                            | Run the golden set and print accuracy metrics (planned, T-020)              |
+| `npm run eval`                            | Run the golden set, print the metrics and write `eval/results.json`         |
 
 ## Knowledge base
 

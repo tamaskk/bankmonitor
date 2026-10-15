@@ -164,6 +164,7 @@ The agent must not "fix" these.
 - No `streamObject` / `generateObject`: structured output goes through `streamText` / `generateText` with `Output.object` (deprecated since AI SDK 6; re-check for v7).
 - The answer streams before it is validated. The UI marks it as unverified and replaces it with the final result. This is the accepted trade-off for responsiveness.
 - LLM rerank instead of a cross-encoder: no extra vendor, and the score is the refusal threshold. Results below `RERANK_THRESHOLD` are dropped even if that leaves nothing.
+- The rerank prompt is the plain 0–10 relevance scale, with no rule about the product or bank named in the question. The reranker cannot see the active filters, so such a rule capped bank-specific chunks whenever the question itself named no bank: with the MBH Bank filter no MBH chunk survived. Eval at threshold 6, with the rule: recall@5 90.9%; without it: 100%; correct refusal 4/4 both times. Filters are already applied in the search stage.
 - Output schemas have no Zod `min` / `max`: OpenAI strict structured output rejects some JSON Schema keywords. Range checks happen in code.
 - Two separate queries plus RRF in TypeScript, not `$rankFusion`: the two run in parallel, and `$rankFusion` support on M0 is not documented.
 - Chunks carry only `products` and `banks` from their document. Display fields (`title`, `sourceUrl`, `updatedAt`) are read from `documents` by `_id` (one `find` with `$in` over the reranked slugs), not copied onto chunks.

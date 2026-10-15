@@ -80,7 +80,7 @@ npm run generate:check  one question through retrieval and generation (read-only
 npm run pipeline:check  answerQuestion event sequence for 3 questions (read-only; model calls)
 npm run db:indexes      create collections and Atlas search indexes (ask before running)
 npm run ingest        load data/docs into Atlas, idempotent; `-- --force` re-embeds all (ask before running)
-npm run eval          run the golden set (planned; costs OpenAI calls)
+npm run eval          run the golden set, write eval/results.json; exit 1 on a missed target (ask first: costs OpenAI calls)
 ```
 
 If a command fails, report the exact output. Do not work around it silently.
