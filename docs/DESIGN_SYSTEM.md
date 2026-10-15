@@ -97,11 +97,13 @@ Reuse before creating. Primitives live in `src/components/ui/` (shadcn, do not e
 | Badge      | shadcn                                        | status badges (§02 tinted pattern), `[n]` markers, product and bank tags                                |
 | Card       | shadcn                                        | Source cards, answer container                                                                          |
 | Select     | shadcn                                        | Product and bank filters                                                                                |
+| Input      | shadcn                                        | Login fields (`h-11` below `sm`)                                                                        |
+| Label      | shadcn                                        | Visible labels above fields                                                                             |
 | Textarea   | shadcn                                        | Question input: Enter sends, Shift+Enter new line, disabled while loading                               |
 | ScrollArea | shadcn                                        | Chunk text on a source card, max height 16rem                                                           |
 | EmptyState | project (`src/components/ui/empty-state.tsx`) | Empty chat: one line + example questions                                                                |
 
-Feature components live in `src/components/chat/`: `filter-bar.tsx`, `chat-input.tsx`, `answer-view.tsx`, `source-card.tsx`.
+Login form: `src/components/auth/login-form.tsx`, a centered card (`max-w-sm`) with labelled fields, one primary "Belépés" button and a destructive error line "Hibás felhasználónév vagy jelszó.". Feature components live in `src/components/chat/`: `filter-bar.tsx`, `chat-input.tsx`, `answer-view.tsx`, `source-card.tsx`.
 
 States:
 

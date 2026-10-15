@@ -22,7 +22,7 @@ The caller gives you a range (e.g. `main...HEAD`) or files. If not, review `git 
 
 1. Correctness: edge cases, null and undefined, async errors, race conditions, off-by-one, wrong status codes.
    Accuracy guards: no `temperature`, no `streamObject` / `generateObject`, threshold and `not_found` paths intact, citation validator not loosened, every run ends with one `final` or `error` event.
-2. Security basics: Basic Auth coverage (proxy matcher), input validation, secrets in client code. Deep security work belongs to security-auditor.
+2. Security basics: login wall coverage (proxy matcher, public paths), input validation, secrets in client code. Deep security work belongs to security-auditor.
 3. Boundaries (ARCHITECTURE.md §05): no db, env or OpenAI imports in client components; thin routes; pipeline logic in `src/lib/`; `chunk.ts`, `rrf.ts`, `validate.ts` stay pure.
 4. Types: no `any`, no unexplained ts-ignore, types that match the domain.
 5. Tests: pure modules are tested (Arrange-Act-Assert); bug fixes have a reproducing test.

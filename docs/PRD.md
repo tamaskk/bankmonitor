@@ -11,7 +11,7 @@ Background and the full production plan: [docs/planning/solution-design.hu.md](p
 | Product name | KB Assistant (UI title: "Tudásbázis asszisztens")                                                                                                                                                                                                                              |
 | Tagline      | Source-cited knowledge base answers for Bankmonitor loan experts                                                                                                                                                                                                               |
 | Description  | An internal RAG assistant: a loan expert asks a question in Hungarian, the system retrieves the relevant knowledge base passages and answers only from them, with a verbatim quote and a link for every claim. When no reliable source exists, it says so instead of guessing. |
-| Stage        | MVP: a one-day interview demo, publicly deployed behind Basic Auth                                                                                                                                                                                                             |
+| Stage        | MVP: a one-day interview demo, publicly deployed behind a login page                                                                                                                                                                                                           |
 | Platform     | Web app                                                                                                                                                                                                                                                                        |
 
 ## 02 Problem
@@ -56,7 +56,7 @@ Not for:
 
 Key user flow:
 
-1. The expert opens the demo URL and logs in with Basic Auth.
+1. The expert opens the demo URL and signs in on the login page.
 2. They pick a product filter (optionally a bank) and ask a question in Hungarian.
 3. They read the streamed answer, check the highlighted quote on the source card, and open the Bankmonitor article if needed.
 
@@ -90,7 +90,6 @@ Do not build these in the demo, even if they look easy. They are covered verball
 - Final `RERANK_THRESHOLD` value (starts at 6, tuned by T-020).
 - The installed `ai` package is v7; the plan was written against AI SDK 6 (`Output.object`, `partialOutputStream`). Verify the current API before T-011 and T-013.
 - Answer rate and recall@5 targets (marked assumed in §06).
-- Does `/api/health` stay behind Basic Auth, or is it excluded from the proxy matcher?
 - Primary brand color and font (DESIGN_SYSTEM.md §01–§03 are assumed).
 - `cacheComponents` is on (Next.js 16.4 default): confirm `await connection()` keeps `/api/banks` fresh after an ingest (T-015).
 

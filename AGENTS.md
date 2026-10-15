@@ -55,7 +55,7 @@ Do these in order, every session:
 
 - Secrets live in environment variables and are read on the server only, through `src/lib/env.ts`.
   Never log them, never send them to the client. The repository is public.
-- Authorization is checked on every server entry point, not just in the UI (Basic Auth in `src/proxy.ts`).
+- Authorization is checked on every server entry point, not just in the UI (login wall in `src/proxy.ts`).
 - Escape and validate everything that comes from a user, a model, or a document.
 - Database filters only from Zod-validated values. Never pass request objects or `$`-prefixed input into a MongoDB filter or pipeline (NoSQL injection).
 - No new auth flow, data deletion behavior, or change to the relevance threshold or the citation validator without explicit approval.
