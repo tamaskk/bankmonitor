@@ -16,7 +16,11 @@
     "eval": "tsx --conditions=react-server scripts/eval.ts",
     "db:indexes": "tsx --conditions=react-server scripts/create-indexes.ts",
     "db:check": "tsx --conditions=react-server scripts/db-check.ts",
-    "search:check": "tsx --conditions=react-server scripts/search-check.ts"
+    "search:check": "tsx --conditions=react-server scripts/search-check.ts",
+    "rerank:check": "tsx --conditions=react-server scripts/rerank-check.ts",
+    "rewrite:check": "tsx --conditions=react-server scripts/rewrite-check.ts",
+    "generate:check": "tsx --conditions=react-server scripts/generate-check.ts",
+    "pipeline:check": "tsx --conditions=react-server scripts/pipeline-check.ts"
   },
   "dependencies": {
     "@ai-sdk/openai": "^4.0.94",

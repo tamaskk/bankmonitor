@@ -21,3 +21,8 @@ export type Candidate = {
   sourceUrl: string;
   updatedAt: string;
 };
+
+// A candidate that passed the rerank threshold; `score` is the 0–10 rerank score.
+export type RankedCandidate = Candidate & { score: number };
+
+export type ChatTurn = { role: "user" | "assistant"; content: string };
