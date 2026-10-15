@@ -1,0 +1,125 @@
+[
+  {
+    "id": "gs-01",
+    "question": "Mennyi a személyi kölcsön maximális futamideje?",
+    "product": "szemelyi_kolcson",
+    "bank": null,
+    "expected_sources": ["szemelyi-kolcson-alapok"],
+    "answerable": true
+  },
+  {
+    "id": "gs-02",
+    "question": "Mekkora a személyi kölcsön minimális hitelösszege?",
+    "product": "szemelyi_kolcson",
+    "bank": null,
+    "expected_sources": [
+      "szemelyi-kolcson-alapok",
+      "mbh-bank-szemelyi-kolcson"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "gs-03",
+    "question": "Mennyi a maximális futamidő?",
+    "product": "lakashitel",
+    "bank": null,
+    "expected_sources": ["lakashitel-alapok"],
+    "answerable": true
+  },
+  {
+    "id": "gs-04",
+    "question": "Mennyi a maximális futamidő?",
+    "product": "szemelyi_kolcson",
+    "bank": null,
+    "expected_sources": ["szemelyi-kolcson-alapok"],
+    "answerable": true
+  },
+  {
+    "id": "gs-05",
+    "question": "Mekkora összegű személyi kölcsönt lehet felvenni?",
+    "product": "szemelyi_kolcson",
+    "bank": "MBH Bank",
+    "expected_sources": ["mbh-bank-szemelyi-kolcson"],
+    "answerable": true
+  },
+  {
+    "id": "gs-06",
+    "question": "Mekkora havi jóváírás kell ahhoz, hogy a Top számlacsomag számlavezetése díjmentes legyen?",
+    "product": "bankszamla",
+    "bank": "OTP Bank",
+    "expected_sources": ["otp-bank-bankszamla"],
+    "answerable": true
+  },
+  {
+    "id": "gs-07",
+    "question": "Ugye a számlavezetés mindig ingyenes?",
+    "product": "bankszamla",
+    "bank": null,
+    "expected_sources": ["bankszamla-dijak"],
+    "answerable": true
+  },
+  {
+    "id": "gs-08",
+    "question": "Havonta hányszor és mekkora összegben lehet díjmentesen készpénzt felvenni?",
+    "product": "bankszamla",
+    "bank": null,
+    "expected_sources": ["ingyenes-keszpenzfelvetel"],
+    "answerable": true
+  },
+  {
+    "id": "gs-09",
+    "question": "Mennyi az Otthon Start hitel kamata?",
+    "product": "lakashitel",
+    "bank": null,
+    "expected_sources": ["otthon-start"],
+    "answerable": true
+  },
+  {
+    "id": "gs-10",
+    "question": "Benne van a közjegyzői díj a THM-ben?",
+    "product": "osszes",
+    "bank": null,
+    "expected_sources": ["thm-jelentese"],
+    "answerable": true
+  },
+  {
+    "id": "gs-11",
+    "question": "Mennyibe kerül az ügyfélnek a Bankmonitor hitelszakértőinek szolgáltatása?",
+    "product": "osszes",
+    "bank": null,
+    "expected_sources": ["hitelkozvetites"],
+    "answerable": true
+  },
+  {
+    "id": "gs-12",
+    "question": "Milyen kriptobefektetést ajánl a bank?",
+    "product": "osszes",
+    "bank": null,
+    "expected_sources": [],
+    "answerable": false
+  },
+  {
+    "id": "gs-13",
+    "question": "Mennyi az autóhitel maximális futamideje?",
+    "product": "osszes",
+    "bank": null,
+    "expected_sources": [],
+    "answerable": false
+  },
+  {
+    "id": "gs-14",
+    "question": "Mennyi a diákhitel kamata?",
+    "product": "osszes",
+    "bank": null,
+    "expected_sources": [],
+    "answerable": false
+  },
+  {
+    "id": "gs-15",
+    "question": "Hogyan lehet céges bankszámlát nyitni egy Kft. számára?",
+    "product": "bankszamla",
+    "bank": null,
+    "expected_sources": [],
+    "answerable": false
+  }
+]
