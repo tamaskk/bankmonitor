@@ -36,7 +36,6 @@ export function Chat() {
 
       <section
         aria-label="Beszélgetés"
-        aria-live="polite"
         className="flex flex-1 flex-col gap-6 py-6"
       >
         {messages.length === 0 ? (
@@ -49,7 +48,7 @@ export function Chat() {
                   <Button
                     key={question}
                     variant="link"
-                    className="h-auto whitespace-normal"
+                    className="h-auto min-h-11 whitespace-normal sm:min-h-0"
                     onClick={() => send(question)}
                   >
                     {question}

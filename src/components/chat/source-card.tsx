@@ -1,19 +1,12 @@
 import { ExternalLinkIcon } from "lucide-react";
 
 import { highlightQuotes } from "@/components/chat/answer-text";
-import { PRODUCT_LABELS } from "@/components/chat/chat-state";
+import { GENERAL_BANK_TAG, productLabel } from "@/components/chat/chat-state";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { GENERAL_BANK, PRODUCTS, type Product } from "@/db/types";
 import type { CitedSource } from "@/lib/pipeline";
 import { cn } from "@/lib/utils";
-
-function productLabel(product: string): string {
-  return (PRODUCTS as readonly string[]).includes(product)
-    ? PRODUCT_LABELS[product as Product]
-    : product;
-}
 
 export function sourceCardId(messageId: string, n: number): string {
   return `source-${messageId}-${n}`;
@@ -35,7 +28,7 @@ export function SourceCard({
   highlighted,
 }: SourceCardProps) {
   const { segments, unmatched } = highlightQuotes(source.content, quotes);
-  const banks = source.banks.filter((bank) => bank !== GENERAL_BANK);
+  const banks = source.banks.filter((bank) => bank !== GENERAL_BANK_TAG);
 
   return (
     <Card
@@ -77,9 +70,9 @@ export function SourceCard({
         </a>
       </CardHeader>
       <CardContent className="flex flex-col gap-3">
-        {unmatched.map((quote) => (
+        {unmatched.map((quote, index) => (
           <blockquote
-            key={quote}
+            key={`${index}-${quote}`}
             className="bg-muted rounded-md p-3 text-sm leading-relaxed wrap-break-word"
           >
             <mark className="bg-primary/15 text-inherit">{quote}</mark>

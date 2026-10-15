@@ -107,7 +107,11 @@ export function AnswerView({ message }: { message: UiMessage }) {
         </div>
       ) : (
         <>
-          <StatusBadge message={message} />
+          {/* Only the verification state is announced, never the
+              unverified text as it streams. */}
+          <div role="status">
+            <StatusBadge message={message} />
+          </div>
           <p
             className={cn(
               "max-w-prose text-sm leading-relaxed wrap-break-word whitespace-pre-wrap",
@@ -129,7 +133,7 @@ export function AnswerView({ message }: { message: UiMessage }) {
                           onClick={() => showSource(part.n)}
                         />
                       }
-                      className="mx-1 cursor-pointer align-baseline"
+                      className="relative mx-1 cursor-pointer overflow-visible align-baseline after:absolute after:-inset-3"
                     >
                       [{part.n}]
                     </Badge>

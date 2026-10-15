@@ -2,10 +2,17 @@ import { describe, expect, it } from "vitest";
 
 import {
   buildHistory,
+  GENERAL_BANK_TAG,
   MAX_HISTORY_CHARS,
+  MAX_HISTORY_TURNS,
+  MAX_QUESTION_CHARS,
+  PRODUCT_LABELS,
   type UiMessage,
 } from "@/components/chat/chat-state";
+import { parseEvent } from "@/components/chat/events";
 import { splitLines } from "@/components/chat/ndjson";
+import { GENERAL_BANK, PRODUCTS } from "@/db/types";
+import * as limits from "@/lib/retrieval/query";
 import type { FinalResult } from "@/lib/pipeline";
 
 function result(status: FinalResult["status"], answer: string): FinalResult {
@@ -95,5 +102,61 @@ describe("buildHistory", () => {
     const history = buildHistory(messages);
 
     expect(history[1].content).toHaveLength(MAX_HISTORY_CHARS);
+  });
+});
+
+describe("client copies of server values", () => {
+  it("match the request limits and the stored tags", () => {
+    const client = {
+      turns: MAX_HISTORY_TURNS,
+      chars: MAX_HISTORY_CHARS,
+      question: MAX_QUESTION_CHARS,
+      general: GENERAL_BANK_TAG,
+      products: Object.keys(PRODUCT_LABELS).sort(),
+    };
+
+    const server = {
+      turns: limits.MAX_HISTORY_TURNS,
+      chars: limits.MAX_HISTORY_CHARS,
+      question: limits.MAX_QUESTION_CHARS,
+      general: GENERAL_BANK,
+      products: [...PRODUCTS].sort(),
+    };
+
+    expect(client).toEqual(server);
+  });
+});
+
+describe("parseEvent", () => {
+  it("accepts a well-formed final event", () => {
+    const line = JSON.stringify({
+      type: "final",
+      result: {
+        status: "not_found",
+        answer: "Nincs forrás.",
+        reason: "no_relevant_source",
+        citations: [],
+        retrieved: [],
+      },
+    });
+
+    const event = parseEvent(line);
+
+    expect(event?.type).toBe("final");
+  });
+
+  it("drops a final event without citations, an unknown type and broken JSON", () => {
+    const lines = [
+      JSON.stringify({
+        type: "final",
+        result: { status: "answered", answer: "x" },
+      }),
+      JSON.stringify({ type: "debug", data: 1 }),
+      '{"type":"partial"',
+    ];
+
+    const events = lines.map(parseEvent);
+
+    expect(events).toEqual([null, null, null]);
   });
 });

@@ -13,10 +13,13 @@ export type UiMessage = {
 
 export const DEFAULT_FILTERS: Filters = { product: "osszes", bank: null };
 
-// The request schema in /api/chat: at most six turns of 2000 characters.
+// Client copies of server values: client code may import only types from
+// src/lib and src/db (ARCHITECTURE.md §05). tests/chat-state.test.ts fails
+// if they drift from the request schema or the stored tags.
 export const MAX_HISTORY_TURNS = 6;
 export const MAX_HISTORY_CHARS = 2000;
 export const MAX_QUESTION_CHARS = 1000;
+export const GENERAL_BANK_TAG = "altalanos";
 
 export const PRODUCT_LABELS: Record<Product, string> = {
   lakashitel: "Lakáshitel",
@@ -24,6 +27,12 @@ export const PRODUCT_LABELS: Record<Product, string> = {
   bankszamla: "Bankszámla",
   altalanos: "Általános",
 };
+
+export function productLabel(product: string): string {
+  return Object.hasOwn(PRODUCT_LABELS, product)
+    ? PRODUCT_LABELS[product as Product]
+    : product;
+}
 
 /**
  * The context sent with a follow-up: user questions and verified answers
