@@ -63,6 +63,7 @@ Do not add a dependency that overlaps with a row in this table without asking.
   tests/                   Vitest unit tests (*.test.ts)
   src/
     proxy.ts               Basic Auth for every route
+    instrumentation.ts     validates env at server start (not during build)
     app/
       page.tsx             chat UI (client component)
       api/chat/route.ts    POST, NDJSON stream of PipelineEvent
