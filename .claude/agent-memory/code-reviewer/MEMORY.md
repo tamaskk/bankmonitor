@@ -1,0 +1,6 @@
+- Client chat code: check 44px touch targets (badges, link buttons, h-8 selects) and aria-live scope; rules demand 44px on touch layouts.
+- Client constants duplicated from server schemas (e.g. MAX_QUESTION_CHARS in chat-state vs retrieval/query) drift; prefer type-only imports plus a comment or a shared pure module.
+- NDJSON client loops: check that processing stops after `final`/`error` and that the trailing buffer/decoder is flushed.
+- Eval/golden-set: citation accuracy is measured against expected_sources only, so valid citations of general docs count as wrong; check committed eval/results.json against targets before accepting a task as done.
+- Tests that restore process.env with `= saved.x` set the string "undefined" when it was unset; use delete.
+- Prompt edits in rerank.ts alter the relevance gate; AGENTS.md §05 needs explicit approval even if only one line.
