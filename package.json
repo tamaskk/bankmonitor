@@ -12,9 +12,10 @@
     "format:check": "prettier --check .",
     "test": "vitest run",
     "test:watch": "vitest",
-    "ingest": "tsx scripts/ingest.ts",
-    "eval": "tsx scripts/eval.ts",
-    "db:indexes": "tsx scripts/create-indexes.ts"
+    "ingest": "tsx --conditions=react-server scripts/ingest.ts",
+    "eval": "tsx --conditions=react-server scripts/eval.ts",
+    "db:indexes": "tsx --conditions=react-server scripts/create-indexes.ts",
+    "db:check": "tsx --conditions=react-server scripts/db-check.ts"
   },
   "dependencies": {
     "@ai-sdk/openai": "^4.0.94",
